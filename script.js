@@ -51,7 +51,9 @@ const dd = String(today.getDate()).padStart(2, "0");
 const todayKey = `${yyyy}-${mm}-${dd}`;
 const dateSeed = Number(`${yyyy}${mm}${dd}`);
 
-dateTextEl.textContent = `今日: ${yyyy}/${mm}/${dd}`;
+if (dateTextEl) {
+  dateTextEl.textContent = `今日: ${yyyy}/${mm}/${dd}`;
+}
 
 let currentMode = "daily";
 let questions = [];
@@ -111,13 +113,15 @@ function getLastModeRecord(mode) {
 }
 
 function getBestModeRecord(mode) {
-  const records = getModeRecords(mode);
+  const records = getModeRecords(mode).filter(
+    (record) => record.correct === modeConfig[mode].count
+  );
+
   if (!records.length) return null;
+
   return records.reduce((best, current) => {
-    if (current.correct !== modeConfig[mode].count) return best;
-    if (!best) return current;
     return current.totalMs < best.totalMs ? current : best;
-  }, null);
+  });
 }
 
 function getTodayModeCount(mode) {
@@ -202,6 +206,8 @@ function generateQuestions() {
 }
 
 function renderQuestions() {
+  if (!quizFormEl) return;
+
   quizFormEl.innerHTML = "";
 
   questions.forEach((question, index) => {
@@ -228,47 +234,54 @@ function renderQuestions() {
 function startTimer() {
   finished = false;
   startTime = Date.now();
-  timerEl.textContent = "00:00";
+
+  if (timerEl) {
+    timerEl.textContent = "00:00";
+  }
 
   if (timerId) clearInterval(timerId);
+
   timerId = setInterval(() => {
-    if (finished) return;
+    if (finished || !timerEl) return;
     timerEl.textContent = formatTime(Date.now() - startTime);
   }, 200);
 }
 
 function resetResultView() {
-  resultEmptyEl.classList.remove("hidden");
-  resultPanelEl.classList.add("hidden");
-  bestUpdateEl.classList.add("hidden");
-  speedRatingEl.classList.add("hidden");
-  comparisonTextEl.textContent = "";
+  if (resultEmptyEl) resultEmptyEl.classList.remove("hidden");
+  if (resultPanelEl) resultPanelEl.classList.add("hidden");
+  if (bestUpdateEl) bestUpdateEl.classList.add("hidden");
+  if (speedRatingEl) speedRatingEl.classList.add("hidden");
+  if (comparisonTextEl) comparisonTextEl.textContent = "";
 }
 
 function updateModeHeader() {
   const config = modeConfig[currentMode];
-  modeNameEl.textContent = config.name;
-  modeDescriptionEl.textContent = config.description;
+  if (modeNameEl) modeNameEl.textContent = config.name;
+  if (modeDescriptionEl) modeDescriptionEl.textContent = config.description;
 }
 
 function updateStatsView() {
   const todayCount = getTodayModeCount(currentMode);
-  todayCountEl.textContent = `${todayCount}回`;
+  if (todayCountEl) todayCountEl.textContent = `${todayCount}回`;
 
   const bestRecord = getBestModeRecord(currentMode);
-  bestTimeEl.textContent = bestRecord
-    ? `${formatTime(bestRecord.totalMs)}`
-    : "未記録";
+  if (bestTimeEl) {
+    bestTimeEl.textContent = bestRecord ? formatTime(bestRecord.totalMs) : "未記録";
+  }
 
   const lastRecord = getLastModeRecord(currentMode);
   if (!lastRecord) {
-    lastRecordTextEl.textContent = "未記録";
+    if (lastRecordTextEl) lastRecordTextEl.textContent = "未記録";
     return;
   }
 
-  lastRecordTextEl.textContent =
-    `${lastRecord.correct}/${modeConfig[currentMode].count}問正解 ・ ` +
-    `${formatTime(lastRecord.totalMs)} ・ ${formatAverage(lastRecord.totalMs, modeConfig[currentMode].count)}`;
+  if (lastRecordTextEl) {
+    lastRecordTextEl.textContent =
+      `${lastRecord.correct}/${modeConfig[currentMode].count}問正解 ・ ` +
+      `${formatTime(lastRecord.totalMs)} ・ ` +
+      `${formatAverage(lastRecord.totalMs, modeConfig[currentMode].count)}`;
+  }
 }
 
 function switchMode(mode) {
@@ -287,26 +300,29 @@ function switchMode(mode) {
 }
 
 function showResults(correct, totalMs, comparisonMessage, bestUpdated) {
-  resultEmptyEl.classList.add("hidden");
-  resultPanelEl.classList.remove("hidden");
-
   const count = modeConfig[currentMode].count;
   const avgSec = totalMs / 1000 / count;
 
-  correctCountEl.textContent = `${correct}/${count}`;
-  finalTimeEl.textContent = formatTime(totalMs);
-  averageTimeEl.textContent = `${formatAverage(totalMs, count)} (${avgSec.toFixed(1)}秒)`;
-  comparisonTextEl.textContent = comparisonMessage;
+  if (resultEmptyEl) resultEmptyEl.classList.add("hidden");
+  if (resultPanelEl) resultPanelEl.classList.remove("hidden");
+  if (correctCountEl) correctCountEl.textContent = `${correct}/${count}`;
+  if (finalTimeEl) finalTimeEl.textContent = formatTime(totalMs);
+  if (averageTimeEl) {
+    averageTimeEl.textContent = `${formatAverage(totalMs, count)} (${avgSec.toFixed(1)}秒)`;
+  }
+  if (comparisonTextEl) comparisonTextEl.textContent = comparisonMessage;
 
-  if (bestUpdated) {
+  if (bestUpdated && bestUpdateEl) {
     bestUpdateEl.textContent = "ベスト更新！";
     bestUpdateEl.classList.remove("hidden");
-  } else {
+  } else if (bestUpdateEl) {
     bestUpdateEl.classList.add("hidden");
   }
 
-  speedRatingEl.textContent = `速度評価: ${getSpeedRating(avgSec)}`;
-  speedRatingEl.classList.remove("hidden");
+  if (speedRatingEl) {
+    speedRatingEl.textContent = `速度評価: ${getSpeedRating(avgSec)}`;
+    speedRatingEl.classList.remove("hidden");
+  }
 }
 
 function checkAnswers() {
@@ -316,15 +332,19 @@ function checkAnswers() {
   questions.forEach((question, index) => {
     const input = document.getElementById(`answer-${index}`);
     const feedback = document.getElementById(`feedback-${index}`);
-    const value = Number(input.value);
+    const value = Number(input ? input.value : "");
 
     if (value === question.answer) {
       correct += 1;
-      feedback.textContent = "○";
-      feedback.className = "feedback correct";
+      if (feedback) {
+        feedback.textContent = "○";
+        feedback.className = "feedback correct";
+      }
     } else {
-      feedback.textContent = `× 正解: ${question.answer}`;
-      feedback.className = "feedback wrong";
+      if (feedback) {
+        feedback.textContent = `× 正解: ${question.answer}`;
+        feedback.className = "feedback wrong";
+      }
     }
   });
 
@@ -373,7 +393,12 @@ tabs.forEach((tab) => {
   });
 });
 
-checkButtonEl.addEventListener("click", checkAnswers);
-retryButtonEl.addEventListener("click", () => switchMode(currentMode));
+if (checkButtonEl) {
+  checkButtonEl.addEventListener("click", checkAnswers);
+}
+
+if (retryButtonEl) {
+  retryButtonEl.addEventListener("click", () => switchMode(currentMode));
+}
 
 switchMode("daily");
