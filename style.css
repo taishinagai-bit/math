@@ -1,0 +1,177 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: #f5f7fb;
+  color: #1f2937;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+.header h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+}
+
+.dateText {
+  margin: 0;
+  color: #667085;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  margin-bottom: 16px;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.label {
+  font-size: 13px;
+  color: #667085;
+  margin-bottom: 6px;
+}
+
+.value {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.card h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 22px;
+}
+
+.quizForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.questionRow {
+  display: grid;
+  grid-template-columns: 1fr 110px;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.questionLabel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.questionNumber {
+  font-size: 14px;
+  font-weight: 600;
+  color: #667085;
+  width: 100%;
+}
+
+.answerInput {
+  width: 100%;
+  padding: 12px 10px;
+  border: 1px solid #d0d5dd;
+  border-radius: 12px;
+  font-size: 20px;
+  text-align: center;
+  background: white;
+}
+
+.feedback {
+  grid-column: 1 / -1;
+  font-size: 15px;
+  font-weight: 700;
+  min-height: 20px;
+}
+
+.correct {
+  color: #067647;
+}
+
+.wrong {
+  color: #b42318;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+button {
+  appearance: none;
+  border: none;
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  background: #111827;
+  color: #ffffff;
+}
+
+button.secondary {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.result {
+  margin-top: 16px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .value {
+    font-size: 18px;
+  }
+
+  .questionRow {
+    grid-template-columns: 1fr;
+  }
+
+  .questionLabel {
+    font-size: 20px;
+  }
+
+  .answerInput {
+    font-size: 18px;
+  }
+
+  .buttonRow {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+  }
+}
