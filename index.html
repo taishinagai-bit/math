@@ -3,10 +3,95 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>テスト</title>
+  <title>毎日の計算トレーニング</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Hello Math</h1>
-  <p>GitHub Pages は動いています。</p>
+  <main class="container">
+    <header class="header">
+      <h1>毎日の計算トレーニング</h1>
+      <p id="dateText" class="dateText"></p>
+    </header>
+
+    <section class="card">
+      <div class="modeTabs">
+        <button class="modeTab active" data-mode="daily" type="button">今日のドリル</button>
+        <button class="modeTab" data-mode="ten" type="button">10問連続</button>
+        <button class="modeTab" data-mode="carry" type="button">繰り上がり特化</button>
+        <button class="modeTab" data-mode="borrow" type="button">繰り下がり特化</button>
+      </div>
+    </section>
+
+    <section class="card summaryCard">
+      <div class="summaryGrid">
+        <div class="summaryItem">
+          <div class="label">モード</div>
+          <div id="modeName" class="value"></div>
+        </div>
+        <div class="summaryItem">
+          <div class="label">タイム</div>
+          <div id="timer" class="value">00:00</div>
+        </div>
+        <div class="summaryItem">
+          <div class="label">今日の回数</div>
+          <div id="todayCount" class="value">0回</div>
+        </div>
+        <div class="summaryItem">
+          <div class="label">ベスト</div>
+          <div id="bestTime" class="value smallValue">未記録</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="cardHeader">
+        <h2>問題</h2>
+        <p id="modeDescription" class="subText"></p>
+      </div>
+
+      <form id="quizForm" class="quizForm"></form>
+
+      <div class="buttonRow">
+        <button id="checkButton" type="button">答え合わせ</button>
+        <button id="retryButton" type="button" class="secondary">同じモードでもう一度</button>
+      </div>
+    </section>
+
+    <section class="card resultCard">
+      <h2>結果</h2>
+      <div id="resultEmpty" class="resultEmpty">まだ結果はありません</div>
+
+      <div id="resultPanel" class="hidden">
+        <div class="resultGrid">
+          <div class="resultItem">
+            <div class="label">正解数</div>
+            <div id="correctCount" class="value"></div>
+          </div>
+          <div class="resultItem">
+            <div class="label">合計タイム</div>
+            <div id="finalTime" class="value"></div>
+          </div>
+          <div class="resultItem">
+            <div class="label">平均時間</div>
+            <div id="averageTime" class="value"></div>
+          </div>
+          <div class="resultItem">
+            <div class="label">前回比較</div>
+            <div id="comparisonText" class="value smallValue"></div>
+          </div>
+        </div>
+
+        <div id="bestUpdate" class="notice hidden"></div>
+        <div id="speedRating" class="notice subtle hidden"></div>
+      </div>
+    </section>
+
+    <section class="card historyCard">
+      <h2>前回の記録</h2>
+      <div id="lastRecordText" class="historyText">未記録</div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
 </body>
 </html>
