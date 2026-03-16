@@ -1,3 +1,5 @@
+const STORAGE_KEY = "math-training-simple-v1";
+
 const modeConfig = {
   daily: {
     name: "今日のドリル",
@@ -40,11 +42,93 @@ const comparisonTextEl = document.getElementById("comparisonText");
 const bestUpdateEl = document.getElementById("bestUpdate");
 const speedRatingEl = document.getElementById("speedRating");
 const lastRecordTextEl = document.getElementById("lastRecordText");
+const dateTextEl = document.getElementById("dateText");
+
+const today = new Date();
+const yyyy = today.getFullYear();
+const mm = String(today.getMonth() + 1).padStart(2, "0");
+const dd = String(today.getDate()).padStart(2, "0");
+const todayKey = `${yyyy}-${mm}-${dd}`;
+
+if (dateTextEl) {
+  dateTextEl.textContent = `今日: ${yyyy}/${mm}/${dd}`;
+}
 
 let currentMode = "daily";
 let questions = [];
 let startTime = Date.now();
 let timerId = null;
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      return {
+        todayCounts: {},
+        bestTimes: {},
+        lastResults: {}
+      };
+    }
+    return JSON.parse(raw);
+  } catch (error) {
+    return {
+      todayCounts: {},
+      bestTimes: {},
+      lastResults: {}
+    };
+  }
+}
+
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function getTodayCount(mode) {
+  const data = loadData();
+  return data.todayCounts?.[todayKey]?.[mode] || 0;
+}
+
+function incrementTodayCount(mode) {
+  const data = loadData();
+
+  if (!data.todayCounts[todayKey]) {
+    data.todayCounts[todayKey] = {};
+  }
+
+  data.todayCounts[todayKey][mode] = (data.todayCounts[todayKey][mode] || 0) + 1;
+  saveData(data);
+}
+
+function getBestTime(mode) {
+  const data = loadData();
+  return data.bestTimes?.[mode] || null;
+}
+
+function setBestTime(mode, ms) {
+  const data = loadData();
+  const currentBest = data.bestTimes?.[mode] || null;
+
+  let updated = false;
+
+  if (currentBest === null || ms < currentBest) {
+    data.bestTimes[mode] = ms;
+    updated = true;
+  }
+
+  saveData(data);
+  return updated;
+}
+
+function setLastResult(mode, result) {
+  const data = loadData();
+  data.lastResults[mode] = result;
+  saveData(data);
+}
+
+function getLastResult(mode) {
+  const data = loadData();
+  return data.lastResults?.[mode] || null;
+}
 
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -140,6 +224,22 @@ function startTimer() {
   }, 200);
 }
 
+function updateStats() {
+  const todayCount = getTodayCount(currentMode);
+  todayCountEl.textContent = `${todayCount}回`;
+
+  const best = getBestTime(currentMode);
+  bestTimeEl.textContent = best ? formatTime(best) : "未記録";
+
+  const last = getLastResult(currentMode);
+  if (last) {
+    lastRecordTextEl.textContent =
+      `${last.correct}/${last.total}問正解 ・ ${formatTime(last.totalMs)} ・ ${last.avgSec.toFixed(1)}秒/問`;
+  } else {
+    lastRecordTextEl.textContent = "未記録";
+  }
+}
+
 function switchMode(mode) {
   currentMode = mode;
 
@@ -149,18 +249,23 @@ function switchMode(mode) {
 
   modeNameEl.textContent = modeConfig[mode].name;
   modeDescriptionEl.textContent = modeConfig[mode].description;
-  todayCountEl.textContent = "0回";
-  bestTimeEl.textContent = "未記録";
-  lastRecordTextEl.textContent = "未記録";
 
   resultEmptyEl.classList.remove("hidden");
   resultPanelEl.classList.add("hidden");
   bestUpdateEl.classList.add("hidden");
   speedRatingEl.classList.add("hidden");
 
+  updateStats();
   generateQuestions();
   renderQuestions();
   startTimer();
+}
+
+function getSpeedText(avgSec) {
+  if (avgSec < 1.0) return "かなり速い";
+  if (avgSec < 2.0) return "速い";
+  if (avgSec < 3.0) return "標準";
+  return "伸びしろあり";
 }
 
 function checkAnswers() {
@@ -184,17 +289,45 @@ function checkAnswers() {
   clearInterval(timerId);
 
   const totalMs = Date.now() - startTime;
-  const count = modeConfig[currentMode].count;
-  const avgSec = totalMs / 1000 / count;
+  const total = modeConfig[currentMode].count;
+  const avgSec = totalMs / 1000 / total;
+
+  incrementTodayCount(currentMode);
+
+  const isPerfect = correct === total;
+  let bestUpdated = false;
+
+  if (isPerfect) {
+    bestUpdated = setBestTime(currentMode, totalMs);
+  }
+
+  setLastResult(currentMode, {
+    correct,
+    total,
+    totalMs,
+    avgSec
+  });
 
   resultEmptyEl.classList.add("hidden");
   resultPanelEl.classList.remove("hidden");
-  correctCountEl.textContent = `${correct}/${count}`;
+  correctCountEl.textContent = `${correct}/${total}`;
   finalTimeEl.textContent = formatTime(totalMs);
   averageTimeEl.textContent = `${avgSec.toFixed(1)}秒/問`;
-  comparisonTextEl.textContent = "シンプル版で動作確認中";
-  speedRatingEl.textContent = "まずは問題表示を確認";
+  comparisonTextEl.textContent = isPerfect
+    ? "全問正解でベスト対象"
+    : "ベストは全問正解時のみ更新";
+
+  if (bestUpdated) {
+    bestUpdateEl.textContent = "ベスト更新！";
+    bestUpdateEl.classList.remove("hidden");
+  } else {
+    bestUpdateEl.classList.add("hidden");
+  }
+
+  speedRatingEl.textContent = `速度評価: ${getSpeedText(avgSec)}`;
   speedRatingEl.classList.remove("hidden");
+
+  updateStats();
 }
 
 tabs.forEach((tab) => {
