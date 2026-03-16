@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <p style="padding: 12px; margin: 0; font-weight: bold;">表示テスト</p>
+
   <main class="container">
     <header class="header">
       <h1>毎日の計算トレーニング</h1>
@@ -15,10 +17,10 @@
 
     <section class="card">
       <div class="modeTabs">
-        <button class="modeTab active" data-mode="daily">今日のドリル</button>
-        <button class="modeTab" data-mode="ten">10問連続</button>
-        <button class="modeTab" data-mode="carry">繰り上がり特化</button>
-        <button class="modeTab" data-mode="borrow">繰り下がり特化</button>
+        <button class="modeTab active" data-mode="daily" type="button">今日のドリル</button>
+        <button class="modeTab" data-mode="ten" type="button">10問連続</button>
+        <button class="modeTab" data-mode="carry" type="button">繰り上がり特化</button>
+        <button class="modeTab" data-mode="borrow" type="button">繰り下がり特化</button>
       </div>
     </section>
 
@@ -60,7 +62,8 @@
     <section class="card resultCard">
       <h2>結果</h2>
       <div id="resultEmpty" class="resultEmpty">まだ結果はありません</div>
-      <div id="resultPanel" class="resultPanel hidden">
+
+      <div id="resultPanel" class="hidden">
         <div class="resultGrid">
           <div class="resultItem">
             <div class="label">正解数</div>
