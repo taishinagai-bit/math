@@ -19,6 +19,7 @@
         <button class="modeTab" data-mode="ten" type="button">10問連続</button>
         <button class="modeTab" data-mode="carry" type="button">繰り上がり特化</button>
         <button class="modeTab" data-mode="borrow" type="button">繰り下がり特化</button>
+        <button class="modeTab" data-mode="speed" type="button">高速モード</button>
       </div>
     </section>
 
@@ -49,11 +50,18 @@
         <p id="modeDescription" class="subText"></p>
       </div>
 
+      <div id="progressText" class="subText"></div>
+
       <form id="quizForm" class="quizForm"></form>
 
-      <div class="buttonRow">
+      <div class="buttonRow" id="normalButtons">
         <button id="checkButton" type="button">答え合わせ</button>
         <button id="retryButton" type="button" class="secondary">同じモードでもう一度</button>
+      </div>
+
+      <div class="buttonRow hidden" id="speedButtons">
+        <button id="speedNextButton" type="button">回答して次へ</button>
+        <button id="speedRetryButton" type="button" class="secondary">最初からやり直す</button>
       </div>
     </section>
 
