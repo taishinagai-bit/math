@@ -1,25 +1,40 @@
-const STORAGE_KEY = "math-training-simple-v1";
+const STORAGE_KEY = "math-training-full-v1";
 
 const modeConfig = {
   daily: {
     name: "今日のドリル",
-    description: "日付で変わる5問のドリル",
-    count: 5
+    description: "日付ごとに固定される5問のドリル",
+    count: 5,
+    dailyFixed: true,
+    speedMode: false
   },
   ten: {
     name: "10問連続",
     description: "テンポよく10問解く標準トレーニング",
-    count: 10
+    count: 10,
+    dailyFixed: false,
+    speedMode: false
   },
   carry: {
     name: "繰り上がり特化",
     description: "足し算の繰り上がりだけを集中練習",
-    count: 10
+    count: 10,
+    dailyFixed: false,
+    speedMode: false
   },
   borrow: {
     name: "繰り下がり特化",
     description: "引き算の繰り下がりだけを集中練習",
-    count: 10
+    count: 10,
+    dailyFixed: false,
+    speedMode: false
+  },
+  speed: {
+    name: "高速モード",
+    description: "1問ずつ解いてどんどん進む高速練習",
+    count: 10,
+    dailyFixed: false,
+    speedMode: true
   }
 };
 
@@ -43,12 +58,19 @@ const bestUpdateEl = document.getElementById("bestUpdate");
 const speedRatingEl = document.getElementById("speedRating");
 const lastRecordTextEl = document.getElementById("lastRecordText");
 const dateTextEl = document.getElementById("dateText");
+const progressTextEl = document.getElementById("progressText");
+
+const normalButtonsEl = document.getElementById("normalButtons");
+const speedButtonsEl = document.getElementById("speedButtons");
+const speedNextButtonEl = document.getElementById("speedNextButton");
+const speedRetryButtonEl = document.getElementById("speedRetryButton");
 
 const today = new Date();
 const yyyy = today.getFullYear();
 const mm = String(today.getMonth() + 1).padStart(2, "0");
 const dd = String(today.getDate()).padStart(2, "0");
 const todayKey = `${yyyy}-${mm}-${dd}`;
+const dateSeed = Number(`${yyyy}${mm}${dd}`);
 
 if (dateTextEl) {
   dateTextEl.textContent = `今日: ${yyyy}/${mm}/${dd}`;
@@ -58,6 +80,8 @@ let currentMode = "daily";
 let questions = [];
 let startTime = Date.now();
 let timerId = null;
+let currentQuestionIndex = 0;
+let speedCorrect = 0;
 
 function loadData() {
   try {
@@ -107,7 +131,6 @@ function getBestTime(mode) {
 function setBestTime(mode, ms) {
   const data = loadData();
   const currentBest = data.bestTimes?.[mode] || null;
-
   let updated = false;
 
   if (currentBest === null || ms < currentBest) {
@@ -130,8 +153,16 @@ function getLastResult(mode) {
   return data.lastResults?.[mode] || null;
 }
 
-function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+function seededRandom(seed) {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
+function randInt(min, max, seed = null) {
+  if (seed === null) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  return Math.floor(seededRandom(seed) * (max - min + 1)) + min;
 }
 
 function formatTime(ms) {
@@ -141,43 +172,64 @@ function formatTime(ms) {
   return `${minutes}:${seconds}`;
 }
 
-function makeAdd() {
-  const a = randInt(11, 79);
-  const b = randInt(11, 29);
+function makeAdd(seed = null) {
+  const a = randInt(11, 79, seed === null ? null : seed + 1);
+  const b = randInt(11, 29, seed === null ? null : seed + 2);
   return { text: `${a} + ${b}`, answer: a + b };
 }
 
-function makeSub() {
-  const a = randInt(40, 99);
-  const b = randInt(11, 39);
+function makeSub(seed = null) {
+  const a = randInt(40, 99, seed === null ? null : seed + 1);
+  const b = randInt(11, 39, seed === null ? null : seed + 2);
   const top = Math.max(a, b + 10);
   const bottom = Math.min(b, top - 10);
   return { text: `${top} - ${bottom}`, answer: top - bottom };
 }
 
-function makeCarry() {
+function makeCarry(seed = null) {
   let a, b;
+  let offset = 0;
   do {
-    a = randInt(15, 79);
-    b = randInt(15, 79);
+    a = randInt(15, 79, seed === null ? null : seed + 1 + offset);
+    b = randInt(15, 79, seed === null ? null : seed + 2 + offset);
+    offset += 10;
   } while ((a % 10) + (b % 10) < 10);
   return { text: `${a} + ${b}`, answer: a + b };
 }
 
-function makeBorrow() {
+function makeBorrow(seed = null) {
   let a, b;
+  let offset = 0;
   do {
-    a = randInt(30, 99);
-    b = randInt(11, a - 1);
+    a = randInt(30, 99, seed === null ? null : seed + 1 + offset);
+    b = randInt(11, a - 1, seed === null ? null : seed + 2 + offset);
+    offset += 10;
   } while ((a % 10) >= (b % 10));
   return { text: `${a} - ${b}`, answer: a - b };
 }
 
-function createQuestion(mode) {
-  if (mode === "carry") return makeCarry();
-  if (mode === "borrow") return makeBorrow();
-  if (mode === "ten") return Math.random() < 0.5 ? makeAdd() : makeSub();
-  return Math.random() < 0.5 ? makeAdd() : makeSub();
+function createQuestion(mode, seed = null) {
+  if (mode === "carry") return makeCarry(seed);
+  if (mode === "borrow") return makeBorrow(seed);
+  if (mode === "speed") {
+    if (seed === null) return Math.random() < 0.5 ? makeCarry() : makeBorrow();
+    return seededRandom(seed) < 0.5 ? makeCarry(seed) : makeBorrow(seed);
+  }
+  if (mode === "ten") {
+    if (seed === null) return Math.random() < 0.5 ? makeAdd() : makeSub();
+    return seededRandom(seed) < 0.5 ? makeAdd(seed) : makeSub(seed);
+  }
+  if (mode === "daily") {
+    const chooser = seed === null ? Math.random() : seededRandom(seed);
+    return chooser < 0.25
+      ? makeAdd(seed)
+      : chooser < 0.5
+      ? makeSub(seed)
+      : chooser < 0.75
+      ? makeCarry(seed)
+      : makeBorrow(seed);
+  }
+  return makeAdd(seed);
 }
 
 function generateQuestions() {
@@ -185,11 +237,21 @@ function generateQuestions() {
   const count = modeConfig[currentMode].count;
 
   for (let i = 0; i < count; i++) {
-    questions.push(createQuestion(currentMode));
+    let q;
+    if (modeConfig[currentMode].dailyFixed) {
+      const seed = dateSeed + i * 17 + currentMode.length * 101;
+      q = createQuestion(currentMode, seed);
+    } else {
+      q = createQuestion(currentMode);
+    }
+    questions.push(q);
   }
+
+  currentQuestionIndex = 0;
+  speedCorrect = 0;
 }
 
-function renderQuestions() {
+function renderNormalQuestions() {
   quizFormEl.innerHTML = "";
 
   questions.forEach((q, index) => {
@@ -211,32 +273,101 @@ function renderQuestions() {
     `;
     quizFormEl.appendChild(row);
   });
+
+  if (progressTextEl) {
+    progressTextEl.textContent = `${questions.length}問`;
+  }
+}
+
+function renderSpeedQuestion() {
+  quizFormEl.innerHTML = "";
+
+  const q = questions[currentQuestionIndex];
+  const row = document.createElement("div");
+  row.className = "questionRow";
+  row.innerHTML = `
+    <label class="questionLabel" for="answer-speed">
+      <span class="questionNumber">問${currentQuestionIndex + 1}</span>
+      <span>${q.text} = </span>
+    </label>
+    <input
+      id="answer-speed"
+      class="answerInput"
+      type="number"
+      inputmode="numeric"
+      autocomplete="off"
+    />
+    <div id="feedback-speed" class="feedback"></div>
+  `;
+  quizFormEl.appendChild(row);
+
+  const input = document.getElementById("answer-speed");
+  if (input) input.focus();
+
+  if (progressTextEl) {
+    progressTextEl.textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
+  }
+}
+
+function renderQuestions() {
+  if (!quizFormEl) return;
+
+  if (modeConfig[currentMode].speedMode) {
+    renderSpeedQuestion();
+  } else {
+    renderNormalQuestions();
+  }
 }
 
 function startTimer() {
   startTime = Date.now();
-  timerEl.textContent = "00:00";
+  if (timerEl) timerEl.textContent = "00:00";
 
   if (timerId) clearInterval(timerId);
 
   timerId = setInterval(() => {
-    timerEl.textContent = formatTime(Date.now() - startTime);
+    if (timerEl) {
+      timerEl.textContent = formatTime(Date.now() - startTime);
+    }
   }, 200);
 }
 
 function updateStats() {
-  const todayCount = getTodayCount(currentMode);
-  todayCountEl.textContent = `${todayCount}回`;
+  if (todayCountEl) {
+    todayCountEl.textContent = `${getTodayCount(currentMode)}回`;
+  }
 
   const best = getBestTime(currentMode);
-  bestTimeEl.textContent = best ? formatTime(best) : "未記録";
+  if (bestTimeEl) {
+    bestTimeEl.textContent = best ? formatTime(best) : "未記録";
+  }
 
   const last = getLastResult(currentMode);
-  if (last) {
-    lastRecordTextEl.textContent =
-      `${last.correct}/${last.total}問正解 ・ ${formatTime(last.totalMs)} ・ ${last.avgSec.toFixed(1)}秒/問`;
-  } else {
-    lastRecordTextEl.textContent = "未記録";
+  if (lastRecordTextEl) {
+    if (last) {
+      lastRecordTextEl.textContent =
+        `${last.correct}/${last.total}問正解 ・ ${formatTime(last.totalMs)} ・ ${last.avgSec.toFixed(1)}秒/問`;
+    } else {
+      lastRecordTextEl.textContent = "未記録";
+    }
+  }
+}
+
+function resetResultView() {
+  if (resultEmptyEl) resultEmptyEl.classList.remove("hidden");
+  if (resultPanelEl) resultPanelEl.classList.add("hidden");
+  if (bestUpdateEl) bestUpdateEl.classList.add("hidden");
+  if (speedRatingEl) speedRatingEl.classList.add("hidden");
+}
+
+function updateModeButtons() {
+  const isSpeed = modeConfig[currentMode].speedMode;
+
+  if (normalButtonsEl) {
+    normalButtonsEl.classList.toggle("hidden", isSpeed);
+  }
+  if (speedButtonsEl) {
+    speedButtonsEl.classList.toggle("hidden", !isSpeed);
   }
 }
 
@@ -247,14 +378,11 @@ function switchMode(mode) {
     tab.classList.toggle("active", tab.dataset.mode === mode);
   });
 
-  modeNameEl.textContent = modeConfig[mode].name;
-  modeDescriptionEl.textContent = modeConfig[mode].description;
+  if (modeNameEl) modeNameEl.textContent = modeConfig[mode].name;
+  if (modeDescriptionEl) modeDescriptionEl.textContent = modeConfig[mode].description;
 
-  resultEmptyEl.classList.remove("hidden");
-  resultPanelEl.classList.add("hidden");
-  bestUpdateEl.classList.add("hidden");
-  speedRatingEl.classList.add("hidden");
-
+  updateModeButtons();
+  resetResultView();
   updateStats();
   generateQuestions();
   renderQuestions();
@@ -268,35 +396,30 @@ function getSpeedText(avgSec) {
   return "伸びしろあり";
 }
 
-function checkAnswers() {
-  let correct = 0;
+function makeComparisonText(mode, totalMs) {
+  const last = getLastResult(mode);
+  if (!last) return "初回記録";
 
-  questions.forEach((q, index) => {
-    const input = document.getElementById(`answer-${index}`);
-    const feedback = document.getElementById(`feedback-${index}`);
-    const value = Number(input.value);
+  const diffMs = totalMs - last.totalMs;
+  const diffSec = Math.abs(diffMs / 1000).toFixed(1);
 
-    if (value === q.answer) {
-      correct += 1;
-      feedback.textContent = "○";
-      feedback.className = "feedback correct";
-    } else {
-      feedback.textContent = `× 正解: ${q.answer}`;
-      feedback.className = "feedback wrong";
-    }
-  });
+  if (diffMs < 0) return `前回より速い！ (${diffSec}秒短縮)`;
+  if (diffMs > 0) return `前回より少しゆっくり (${diffSec}秒)`;
+  return "前回と同じタイム";
+}
 
+function finalizeResult(correct, total) {
   clearInterval(timerId);
 
   const totalMs = Date.now() - startTime;
-  const total = modeConfig[currentMode].count;
   const avgSec = totalMs / 1000 / total;
 
   incrementTodayCount(currentMode);
 
   const isPerfect = correct === total;
-  let bestUpdated = false;
+  const comparisonMessage = makeComparisonText(currentMode, totalMs);
 
+  let bestUpdated = false;
   if (isPerfect) {
     bestUpdated = setBestTime(currentMode, totalMs);
   }
@@ -308,26 +431,83 @@ function checkAnswers() {
     avgSec
   });
 
-  resultEmptyEl.classList.add("hidden");
-  resultPanelEl.classList.remove("hidden");
-  correctCountEl.textContent = `${correct}/${total}`;
-  finalTimeEl.textContent = formatTime(totalMs);
-  averageTimeEl.textContent = `${avgSec.toFixed(1)}秒/問`;
-  comparisonTextEl.textContent = isPerfect
-    ? "全問正解でベスト対象"
-    : "ベストは全問正解時のみ更新";
+  if (resultEmptyEl) resultEmptyEl.classList.add("hidden");
+  if (resultPanelEl) resultPanelEl.classList.remove("hidden");
+  if (correctCountEl) correctCountEl.textContent = `${correct}/${total}`;
+  if (finalTimeEl) finalTimeEl.textContent = formatTime(totalMs);
+  if (averageTimeEl) averageTimeEl.textContent = `${avgSec.toFixed(1)}秒/問`;
+  if (comparisonTextEl) comparisonTextEl.textContent = comparisonMessage;
 
-  if (bestUpdated) {
-    bestUpdateEl.textContent = "ベスト更新！";
-    bestUpdateEl.classList.remove("hidden");
-  } else {
-    bestUpdateEl.classList.add("hidden");
+  if (bestUpdateEl) {
+    if (bestUpdated) {
+      bestUpdateEl.textContent = "ベスト更新！";
+      bestUpdateEl.classList.remove("hidden");
+    } else {
+      bestUpdateEl.classList.add("hidden");
+    }
   }
 
-  speedRatingEl.textContent = `速度評価: ${getSpeedText(avgSec)}`;
-  speedRatingEl.classList.remove("hidden");
+  if (speedRatingEl) {
+    speedRatingEl.textContent = `速度評価: ${getSpeedText(avgSec)}`;
+    speedRatingEl.classList.remove("hidden");
+  }
 
   updateStats();
+}
+
+function checkAnswers() {
+  let correct = 0;
+
+  questions.forEach((q, index) => {
+    const input = document.getElementById(`answer-${index}`);
+    const feedback = document.getElementById(`feedback-${index}`);
+    const value = Number(input ? input.value : "");
+
+    if (value === q.answer) {
+      correct += 1;
+      if (feedback) {
+        feedback.textContent = "○";
+        feedback.className = "feedback correct";
+      }
+    } else {
+      if (feedback) {
+        feedback.textContent = `× 正解: ${q.answer}`;
+        feedback.className = "feedback wrong";
+      }
+    }
+  });
+
+  finalizeResult(correct, modeConfig[currentMode].count);
+}
+
+function submitSpeedAnswer() {
+  const input = document.getElementById("answer-speed");
+  const feedback = document.getElementById("feedback-speed");
+  const q = questions[currentQuestionIndex];
+  const value = Number(input ? input.value : "");
+
+  if (value === q.answer) {
+    speedCorrect += 1;
+    if (feedback) {
+      feedback.textContent = "○ 正解";
+      feedback.className = "feedback correct";
+    }
+  } else {
+    if (feedback) {
+      feedback.textContent = `× 正解: ${q.answer}`;
+      feedback.className = "feedback wrong";
+    }
+  }
+
+  currentQuestionIndex += 1;
+
+  setTimeout(() => {
+    if (currentQuestionIndex >= questions.length) {
+      finalizeResult(speedCorrect, questions.length);
+      return;
+    }
+    renderSpeedQuestion();
+  }, 250);
 }
 
 tabs.forEach((tab) => {
@@ -336,7 +516,30 @@ tabs.forEach((tab) => {
   });
 });
 
-checkButtonEl.addEventListener("click", checkAnswers);
-retryButtonEl.addEventListener("click", () => switchMode(currentMode));
+if (checkButtonEl) {
+  checkButtonEl.addEventListener("click", checkAnswers);
+}
+
+if (retryButtonEl) {
+  retryButtonEl.addEventListener("click", () => switchMode(currentMode));
+}
+
+if (speedNextButtonEl) {
+  speedNextButtonEl.addEventListener("click", submitSpeedAnswer);
+}
+
+if (speedRetryButtonEl) {
+  speedRetryButtonEl.addEventListener("click", () => switchMode(currentMode));
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && modeConfig[currentMode].speedMode) {
+    const active = document.activeElement;
+    if (active && active.id === "answer-speed") {
+      event.preventDefault();
+      submitSpeedAnswer();
+    }
+  }
+});
 
 switchMode("daily");
