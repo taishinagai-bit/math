@@ -3,235 +3,94 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>毎日の計算ドリル</title>
+  <title>毎日の計算トレーニング</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="container">
     <header class="header">
-      <h1>毎日の計算ドリル</h1>
+      <h1>毎日の計算トレーニング</h1>
       <p id="dateText" class="dateText"></p>
     </header>
 
+    <section class="card">
+      <div class="modeTabs">
+        <button class="modeTab active" data-mode="daily">今日のドリル</button>
+        <button class="modeTab" data-mode="ten">10問連続</button>
+        <button class="modeTab" data-mode="carry">繰り上がり特化</button>
+        <button class="modeTab" data-mode="borrow">繰り下がり特化</button>
+      </div>
+    </section>
+
     <section class="card summaryCard">
-      <div class="summaryRow">
-        <div>
-          <div class="label">今日のメニュー</div>
-          <div id="menuText" class="value"></div>
+      <div class="summaryGrid">
+        <div class="summaryItem">
+          <div class="label">モード</div>
+          <div id="modeName" class="value"></div>
         </div>
-        <div>
+        <div class="summaryItem">
           <div class="label">タイム</div>
           <div id="timer" class="value">00:00</div>
+        </div>
+        <div class="summaryItem">
+          <div class="label">今日の回数</div>
+          <div id="todayCount" class="value">0回</div>
+        </div>
+        <div class="summaryItem">
+          <div class="label">ベスト</div>
+          <div id="bestTime" class="value smallValue">未記録</div>
         </div>
       </div>
     </section>
 
     <section class="card">
-      <h2>問題</h2>
+      <div class="cardHeader">
+        <h2>問題</h2>
+        <p id="modeDescription" class="subText"></p>
+      </div>
+
       <form id="quizForm" class="quizForm"></form>
 
       <div class="buttonRow">
         <button id="checkButton" type="button">答え合わせ</button>
-        <button id="resetButton" type="button" class="secondary">もう一度</button>
+        <button id="retryButton" type="button" class="secondary">同じモードでもう一度</button>
       </div>
+    </section>
 
-      <div id="result" class="result"></div>
+    <section class="card resultCard">
+      <h2>結果</h2>
+      <div id="resultEmpty" class="resultEmpty">まだ結果はありません</div>
+      <div id="resultPanel" class="resultPanel hidden">
+        <div class="resultGrid">
+          <div class="resultItem">
+            <div class="label">正解数</div>
+            <div id="correctCount" class="value"></div>
+          </div>
+          <div class="resultItem">
+            <div class="label">合計タイム</div>
+            <div id="finalTime" class="value"></div>
+          </div>
+          <div class="resultItem">
+            <div class="label">平均時間</div>
+            <div id="averageTime" class="value"></div>
+          </div>
+          <div class="resultItem">
+            <div class="label">前回比較</div>
+            <div id="comparisonText" class="value smallValue"></div>
+          </div>
+        </div>
+
+        <div id="bestUpdate" class="notice hidden"></div>
+        <div id="speedRating" class="notice subtle hidden"></div>
+      </div>
+    </section>
+
+    <section class="card historyCard">
+      <h2>前回の記録</h2>
+      <div id="lastRecordText" class="historyText">未記録</div>
     </section>
   </main>
 
-  <script>
-    const quizForm = document.getElementById("quizForm");
-    const result = document.getElementById("result");
-    const timerEl = document.getElementById("timer");
-    const dateText = document.getElementById("dateText");
-    const menuText = document.getElementById("menuText");
-    const checkButton = document.getElementById("checkButton");
-    const resetButton = document.getElementById("resetButton");
-
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const dd = String(today.getDate()).padStart(2, "0");
-    const dateSeed = Number(`${yyyy}${mm}${dd}`);
-
-    dateText.textContent = `今日: ${yyyy}/${mm}/${dd}`;
-
-    function seededRandom(seed) {
-      const x = Math.sin(seed) * 10000;
-      return x - Math.floor(x);
-    }
-
-    function randInt(seed, min, max) {
-      return Math.floor(seededRandom(seed) * (max - min + 1)) + min;
-    }
-
-    function getDayMode(seed) {
-      const modes = [
-        { name: "2桁たし算", type: "add2" },
-        { name: "2桁ひき算", type: "sub2" },
-        { name: "繰り上がりたし算", type: "carryAdd" },
-        { name: "繰り下がりひき算", type: "borrowSub" },
-        { name: "ミックス", type: "mix" },
-        { name: "少し速めの計算", type: "speedMix" },
-        { name: "総合チェック", type: "review" }
-      ];
-      return modes[seed % modes.length];
-    }
-
-    const todayMode = getDayMode(dateSeed);
-    menuText.textContent = todayMode.name;
-
-    function makeAdd2(seed) {
-      const a = randInt(seed + 1, 11, 69);
-      const b = randInt(seed + 2, 11, 29);
-      return { text: `${a} + ${b}`, answer: a + b };
-    }
-
-    function makeSub2(seed) {
-      const a = randInt(seed + 1, 40, 99);
-      const b = randInt(seed + 2, 11, 39);
-      const top = Math.max(a, b + 10);
-      const bottom = Math.min(b, top - 10);
-      return { text: `${top} - ${bottom}`, answer: top - bottom };
-    }
-
-    function makeCarryAdd(seed) {
-      let a, b;
-      do {
-        a = randInt(seed + 1, 15, 79);
-        b = randInt(seed + 2, 15, 79);
-      } while (((a % 10) + (b % 10)) < 10);
-      return { text: `${a} + ${b}`, answer: a + b };
-    }
-
-    function makeBorrowSub(seed) {
-      let a, b;
-      do {
-        a = randInt(seed + 1, 30, 99);
-        b = randInt(seed + 2, 11, a - 1);
-      } while ((a % 10) >= (b % 10));
-      return { text: `${a} - ${b}`, answer: a - b };
-    }
-
-    function makeMix(seed) {
-      return seededRandom(seed) < 0.5 ? makeAdd2(seed) : makeSub2(seed);
-    }
-
-    function makeSpeedMix(seed) {
-      return seededRandom(seed) < 0.5 ? makeCarryAdd(seed) : makeBorrowSub(seed);
-    }
-
-    function makeReview(seed) {
-      const makers = [makeAdd2, makeSub2, makeCarryAdd, makeBorrowSub, makeMix];
-      const maker = makers[seed % makers.length];
-      return maker(seed);
-    }
-
-    function createQuestion(seed, modeType) {
-      switch (modeType) {
-        case "add2":
-          return makeAdd2(seed);
-        case "sub2":
-          return makeSub2(seed);
-        case "carryAdd":
-          return makeCarryAdd(seed);
-        case "borrowSub":
-          return makeBorrowSub(seed);
-        case "mix":
-          return makeMix(seed);
-        case "speedMix":
-          return makeSpeedMix(seed);
-        case "review":
-          return makeReview(seed);
-        default:
-          return makeMix(seed);
-      }
-    }
-
-    let questions = [];
-    let startTime = Date.now();
-    let finished = false;
-
-    function generateQuestions() {
-      questions = [];
-      for (let i = 0; i < 5; i++) {
-        questions.push(createQuestion(dateSeed + i * 17, todayMode.type));
-      }
-    }
-
-    function renderQuestions() {
-      quizForm.innerHTML = "";
-      questions.forEach((q, index) => {
-        const row = document.createElement("div");
-        row.className = "questionRow";
-        row.innerHTML = `
-          <label class="questionLabel" for="answer-${index}">
-            <span class="questionNumber">問${index + 1}</span>
-            <span class="questionText">${q.text} = </span>
-          </label>
-          <input
-            id="answer-${index}"
-            class="answerInput"
-            type="number"
-            inputmode="numeric"
-            autocomplete="off"
-          />
-          <div id="feedback-${index}" class="feedback"></div>
-        `;
-        quizForm.appendChild(row);
-      });
-    }
-
-    function formatTime(ms) {
-      const totalSeconds = Math.floor(ms / 1000);
-      const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
-      const seconds = String(totalSeconds % 60).padStart(2, "0");
-      return `${minutes}:${seconds}`;
-    }
-
-    function updateTimer() {
-      if (finished) return;
-      const elapsed = Date.now() - startTime;
-      timerEl.textContent = formatTime(elapsed);
-    }
-
-    function resetDrill() {
-      finished = false;
-      result.textContent = "";
-      startTime = Date.now();
-      generateQuestions();
-      renderQuestions();
-      timerEl.textContent = "00:00";
-    }
-
-    function checkAnswers() {
-      let correct = 0;
-      questions.forEach((q, index) => {
-        const input = document.getElementById(`answer-${index}`);
-        const feedback = document.getElementById(`feedback-${index}`);
-        const value = Number(input.value);
-
-        if (value === q.answer) {
-          correct++;
-          feedback.textContent = "○";
-          feedback.className = "feedback correct";
-        } else {
-          feedback.textContent = `× 正解: ${q.answer}`;
-          feedback.className = "feedback wrong";
-        }
-      });
-
-      finished = true;
-      const finalTime = formatTime(Date.now() - startTime);
-      result.textContent = `5問中 ${correct} 問正解 / タイム ${finalTime}`;
-    }
-
-    checkButton.addEventListener("click", checkAnswers);
-    resetButton.addEventListener("click", resetDrill);
-
-    generateQuestions();
-    renderQuestions();
-    setInterval(updateTimer, 500);
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
