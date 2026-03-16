@@ -1,247 +1,209 @@
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
-  background: #f5f7fb;
-  color: #1f2937;
-}
-
-button,
-input {
-  font: inherit;
-}
-
-.container {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 20px 16px 40px;
-}
-
-.header {
-  margin-bottom: 16px;
-}
-
-.header h1 {
-  margin: 0 0 8px;
-  font-size: 30px;
-  line-height: 1.2;
-}
-
-.dateText {
-  margin: 0;
-  color: #667085;
-  font-size: 14px;
-}
-
-.card {
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 18px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-  margin-bottom: 16px;
-}
-
-.cardHeader {
-  margin-bottom: 14px;
-}
-
-.card h2 {
-  margin: 0 0 6px;
-  font-size: 22px;
-}
-
-.subText {
-  margin: 0;
-  color: #667085;
-  font-size: 14px;
-}
-
-.modeTabs {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.modeTab {
-  border: none;
-  border-radius: 14px;
-  padding: 14px 12px;
-  background: #e5e7eb;
-  color: #111827;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.modeTab.active {
-  background: #111827;
-  color: #ffffff;
-}
-
-.summaryGrid,
-.resultGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-}
-
-.summaryItem,
-.resultItem {
-  background: #f8fafc;
-  border-radius: 14px;
-  padding: 14px;
-}
-
-.label {
-  font-size: 13px;
-  color: #667085;
-  margin-bottom: 6px;
-}
-
-.value {
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.smallValue {
-  font-size: 16px;
-  line-height: 1.5;
-}
-
-.quizForm {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.questionRow {
-  display: grid;
-  grid-template-columns: 1fr 120px;
-  gap: 12px;
-  align-items: center;
-  padding: 14px;
-  border-radius: 16px;
-  background: #f8fafc;
-}
-
-.questionLabel {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  font-size: 26px;
-  font-weight: 700;
-}
-
-.questionNumber {
-  width: 100%;
-  font-size: 14px;
-  color: #667085;
-  font-weight: 600;
-}
-
-.answerInput {
-  width: 100%;
-  padding: 14px 10px;
-  border: 1px solid #d0d5dd;
-  border-radius: 14px;
-  font-size: 22px;
-  text-align: center;
-  background: #ffffff;
-}
-
-.feedback {
-  grid-column: 1 / -1;
-  min-height: 22px;
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.correct {
-  color: #067647;
-}
-
-.wrong {
-  color: #b42318;
-}
-
-.buttonRow {
-  display: flex;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-button {
-  appearance: none;
-  border: none;
-  border-radius: 14px;
-  padding: 14px 18px;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  background: #111827;
-  color: #ffffff;
-}
-
-button.secondary {
-  background: #e5e7eb;
-  color: #111827;
-}
-
-.resultEmpty,
-.historyText {
-  color: #667085;
-  font-size: 15px;
-}
-
-.notice {
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: #ecfdf3;
-  color: #067647;
-  font-weight: 700;
-}
-
-.notice.subtle {
-  background: #eff6ff;
-  color: #1d4ed8;
-}
-
-.hidden {
-  display: none !important;
-}
-
-@media (max-width: 640px) {
-  .header h1 {
-    font-size: 26px;
+const modeConfig = {
+  daily: {
+    name: "今日のドリル",
+    description: "日付で変わる5問のドリル",
+    count: 5
+  },
+  ten: {
+    name: "10問連続",
+    description: "テンポよく10問解く標準トレーニング",
+    count: 10
+  },
+  carry: {
+    name: "繰り上がり特化",
+    description: "足し算の繰り上がりだけを集中練習",
+    count: 10
+  },
+  borrow: {
+    name: "繰り下がり特化",
+    description: "引き算の繰り下がりだけを集中練習",
+    count: 10
   }
+};
 
-  .modeTabs,
-  .summaryGrid,
-  .resultGrid {
-    grid-template-columns: 1fr;
-  }
+const modeNameEl = document.getElementById("modeName");
+const modeDescriptionEl = document.getElementById("modeDescription");
+const timerEl = document.getElementById("timer");
+const todayCountEl = document.getElementById("todayCount");
+const bestTimeEl = document.getElementById("bestTime");
+const quizFormEl = document.getElementById("quizForm");
+const checkButtonEl = document.getElementById("checkButton");
+const retryButtonEl = document.getElementById("retryButton");
+const tabs = Array.from(document.querySelectorAll(".modeTab"));
 
-  .questionRow {
-    grid-template-columns: 1fr;
-  }
+const resultEmptyEl = document.getElementById("resultEmpty");
+const resultPanelEl = document.getElementById("resultPanel");
+const correctCountEl = document.getElementById("correctCount");
+const finalTimeEl = document.getElementById("finalTime");
+const averageTimeEl = document.getElementById("averageTime");
+const comparisonTextEl = document.getElementById("comparisonText");
+const bestUpdateEl = document.getElementById("bestUpdate");
+const speedRatingEl = document.getElementById("speedRating");
+const lastRecordTextEl = document.getElementById("lastRecordText");
 
-  .questionLabel {
-    font-size: 22px;
-  }
+let currentMode = "daily";
+let questions = [];
+let startTime = Date.now();
+let timerId = null;
 
-  .answerInput {
-    font-size: 20px;
-  }
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-  .buttonRow {
-    flex-direction: column;
-  }
+function formatTime(ms) {
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+  const seconds = String(totalSeconds % 60).padStart(2, "0");
+  return `${minutes}:${seconds}`;
+}
 
-  button {
-    width: 100%;
+function makeAdd() {
+  const a = randInt(11, 79);
+  const b = randInt(11, 29);
+  return { text: `${a} + ${b}`, answer: a + b };
+}
+
+function makeSub() {
+  const a = randInt(40, 99);
+  const b = randInt(11, 39);
+  const top = Math.max(a, b + 10);
+  const bottom = Math.min(b, top - 10);
+  return { text: `${top} - ${bottom}`, answer: top - bottom };
+}
+
+function makeCarry() {
+  let a, b;
+  do {
+    a = randInt(15, 79);
+    b = randInt(15, 79);
+  } while ((a % 10) + (b % 10) < 10);
+  return { text: `${a} + ${b}`, answer: a + b };
+}
+
+function makeBorrow() {
+  let a, b;
+  do {
+    a = randInt(30, 99);
+    b = randInt(11, a - 1);
+  } while ((a % 10) >= (b % 10));
+  return { text: `${a} - ${b}`, answer: a - b };
+}
+
+function createQuestion(mode) {
+  if (mode === "carry") return makeCarry();
+  if (mode === "borrow") return makeBorrow();
+  if (mode === "ten") return Math.random() < 0.5 ? makeAdd() : makeSub();
+  return Math.random() < 0.5 ? makeAdd() : makeSub();
+}
+
+function generateQuestions() {
+  questions = [];
+  const count = modeConfig[currentMode].count;
+
+  for (let i = 0; i < count; i++) {
+    questions.push(createQuestion(currentMode));
   }
 }
+
+function renderQuestions() {
+  quizFormEl.innerHTML = "";
+
+  questions.forEach((q, index) => {
+    const row = document.createElement("div");
+    row.className = "questionRow";
+    row.innerHTML = `
+      <label class="questionLabel" for="answer-${index}">
+        <span class="questionNumber">問${index + 1}</span>
+        <span>${q.text} = </span>
+      </label>
+      <input
+        id="answer-${index}"
+        class="answerInput"
+        type="number"
+        inputmode="numeric"
+        autocomplete="off"
+      />
+      <div id="feedback-${index}" class="feedback"></div>
+    `;
+    quizFormEl.appendChild(row);
+  });
+}
+
+function startTimer() {
+  startTime = Date.now();
+  timerEl.textContent = "00:00";
+
+  if (timerId) clearInterval(timerId);
+
+  timerId = setInterval(() => {
+    timerEl.textContent = formatTime(Date.now() - startTime);
+  }, 200);
+}
+
+function switchMode(mode) {
+  currentMode = mode;
+
+  tabs.forEach((tab) => {
+    tab.classList.toggle("active", tab.dataset.mode === mode);
+  });
+
+  modeNameEl.textContent = modeConfig[mode].name;
+  modeDescriptionEl.textContent = modeConfig[mode].description;
+  todayCountEl.textContent = "0回";
+  bestTimeEl.textContent = "未記録";
+  lastRecordTextEl.textContent = "未記録";
+
+  resultEmptyEl.classList.remove("hidden");
+  resultPanelEl.classList.add("hidden");
+  bestUpdateEl.classList.add("hidden");
+  speedRatingEl.classList.add("hidden");
+
+  generateQuestions();
+  renderQuestions();
+  startTimer();
+}
+
+function checkAnswers() {
+  let correct = 0;
+
+  questions.forEach((q, index) => {
+    const input = document.getElementById(`answer-${index}`);
+    const feedback = document.getElementById(`feedback-${index}`);
+    const value = Number(input.value);
+
+    if (value === q.answer) {
+      correct += 1;
+      feedback.textContent = "○";
+      feedback.className = "feedback correct";
+    } else {
+      feedback.textContent = `× 正解: ${q.answer}`;
+      feedback.className = "feedback wrong";
+    }
+  });
+
+  clearInterval(timerId);
+
+  const totalMs = Date.now() - startTime;
+  const count = modeConfig[currentMode].count;
+  const avgSec = totalMs / 1000 / count;
+
+  resultEmptyEl.classList.add("hidden");
+  resultPanelEl.classList.remove("hidden");
+  correctCountEl.textContent = `${correct}/${count}`;
+  finalTimeEl.textContent = formatTime(totalMs);
+  averageTimeEl.textContent = `${avgSec.toFixed(1)}秒/問`;
+  comparisonTextEl.textContent = "シンプル版で動作確認中";
+  speedRatingEl.textContent = "まずは問題表示を確認";
+  speedRatingEl.classList.remove("hidden");
+}
+
+tabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    switchMode(tab.dataset.mode);
+  });
+});
+
+checkButtonEl.addEventListener("click", checkAnswers);
+retryButtonEl.addEventListener("click", () => switchMode(currentMode));
+
+switchMode("daily");
