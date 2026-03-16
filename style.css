@@ -9,8 +9,13 @@ body {
   color: #1f2937;
 }
 
+button,
+input {
+  font: inherit;
+}
+
 .container {
-  max-width: 680px;
+  max-width: 720px;
   margin: 0 auto;
   padding: 20px 16px 40px;
 }
@@ -21,12 +26,14 @@ body {
 
 .header h1 {
   margin: 0 0 8px;
-  font-size: 28px;
+  font-size: 30px;
+  line-height: 1.2;
 }
 
 .dateText {
   margin: 0;
   color: #667085;
+  font-size: 14px;
 }
 
 .card {
@@ -37,10 +44,54 @@ body {
   margin-bottom: 16px;
 }
 
-.summaryRow {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
+.cardHeader {
+  margin-bottom: 14px;
+}
+
+.card h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+
+.subText {
+  margin: 0;
+  color: #667085;
+  font-size: 14px;
+}
+
+.modeTabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.modeTab {
+  border: none;
+  border-radius: 14px;
+  padding: 14px 12px;
+  background: #e5e7eb;
+  color: #111827;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.modeTab.active {
+  background: #111827;
+  color: #ffffff;
+}
+
+.summaryGrid,
+.resultGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.summaryItem,
+.resultItem {
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 14px;
 }
 
 .label {
@@ -54,10 +105,9 @@ body {
   font-weight: 700;
 }
 
-.card h2 {
-  margin-top: 0;
-  margin-bottom: 16px;
-  font-size: 22px;
+.smallValue {
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 .quizForm {
@@ -68,45 +118,45 @@ body {
 
 .questionRow {
   display: grid;
-  grid-template-columns: 1fr 110px;
-  gap: 10px;
+  grid-template-columns: 1fr 120px;
+  gap: 12px;
   align-items: center;
-  padding: 12px;
-  border-radius: 14px;
+  padding: 14px;
+  border-radius: 16px;
   background: #f8fafc;
 }
 
 .questionLabel {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 8px;
-  font-size: 22px;
+  align-items: center;
+  font-size: 26px;
   font-weight: 700;
 }
 
 .questionNumber {
-  font-size: 14px;
-  font-weight: 600;
-  color: #667085;
   width: 100%;
+  font-size: 14px;
+  color: #667085;
+  font-weight: 600;
 }
 
 .answerInput {
   width: 100%;
-  padding: 12px 10px;
+  padding: 14px 10px;
   border: 1px solid #d0d5dd;
-  border-radius: 12px;
-  font-size: 20px;
+  border-radius: 14px;
+  font-size: 22px;
   text-align: center;
-  background: white;
+  background: #ffffff;
 }
 
 .feedback {
   grid-column: 1 / -1;
+  min-height: 22px;
   font-size: 15px;
   font-weight: 700;
-  min-height: 20px;
 }
 
 .correct {
@@ -140,19 +190,39 @@ button.secondary {
   color: #111827;
 }
 
-.result {
-  margin-top: 16px;
-  font-size: 18px;
+.resultEmpty,
+.historyText {
+  color: #667085;
+  font-size: 15px;
+}
+
+.notice {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #ecfdf3;
+  color: #067647;
   font-weight: 700;
+}
+
+.notice.subtle {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.hidden {
+  display: none;
 }
 
 @media (max-width: 640px) {
   .header h1 {
-    font-size: 24px;
+    font-size: 26px;
   }
 
-  .value {
-    font-size: 18px;
+  .modeTabs,
+  .summaryGrid,
+  .resultGrid {
+    grid-template-columns: 1fr;
   }
 
   .questionRow {
@@ -160,11 +230,11 @@ button.secondary {
   }
 
   .questionLabel {
-    font-size: 20px;
+    font-size: 22px;
   }
 
   .answerInput {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   .buttonRow {
