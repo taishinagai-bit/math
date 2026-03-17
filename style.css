@@ -44,11 +44,11 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: url("mascot-bg.PNG");
+  background-image: url("./mascot-bg.png");
   background-repeat: no-repeat;
   background-position: center top;
   background-size: cover;
-  opacity: 0.72;
+  opacity: 1;
   pointer-events: none;
   z-index: 0;
 }
@@ -57,12 +57,7 @@ body::after {
   content: "";
   position: fixed;
   inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(238, 242, 247, 0.08) 0%,
-    rgba(238, 242, 247, 0.04) 40%,
-    rgba(238, 242, 247, 0.10) 100%
-  );
+  background: rgba(238, 242, 247, 0.18);
   pointer-events: none;
   z-index: 0;
 }
@@ -91,7 +86,7 @@ body::after {
   font-size: 14px;
   color: #5f697c;
   font-weight: 800;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.40);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .container {
@@ -340,265 +335,3 @@ button.secondary {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-radius: 22px;
-  box-shadow: var(--card-shadow-strong);
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  max-height: none;
-  overflow: visible;
-}
-
-.modalHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.compactModalHeader {
-  margin-bottom: 8px;
-}
-
-.modalHeader h2 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 800;
-}
-
-.modalGrid {
-  margin-top: 14px;
-}
-
-.playStickyHeader {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
-}
-
-.playScrollArea {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-top: 12px;
-  padding-bottom: 8px;
-  min-height: 220px;
-  flex: 1 1 auto;
-}
-
-.playBlock {
-  margin-top: 0;
-}
-
-.playTitleGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.playModeName {
-  font-size: 20px;
-  font-weight: 800;
-  line-height: 1.2;
-}
-
-.playModeMeta {
-  font-size: 13px;
-  color: var(--sub);
-  font-weight: 700;
-}
-
-.limitBlock {
-  margin-top: 16px;
-  padding: 14px;
-  border-radius: 16px;
-  background: var(--card-soft);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-
-.limitOptions {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.limitOption {
-  min-height: 44px;
-  padding: 10px 8px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.96);
-  color: var(--text);
-  border: 1px solid #dde3ea;
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.limitOption.active {
-  background: var(--accent);
-  color: #ffffff;
-  border-color: var(--accent);
-}
-
-.limitMeterWrap {
-  margin-top: 6px;
-}
-
-.limitMeterLabel {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 13px;
-  color: var(--sub);
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.limitMeterTrack {
-  width: 100%;
-  height: 10px;
-  background: #e5e7eb;
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.limitMeterBar {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, #ef4444, #f59e0b);
-  transform-origin: left center;
-  transition: transform 0.1s linear;
-}
-
-.iconButton {
-  appearance: none;
-  border: none;
-  border-radius: 12px;
-  background: var(--accent-weak);
-  color: var(--text);
-  width: 42px;
-  height: 42px;
-  font-size: 24px;
-  font-weight: 700;
-  cursor: pointer;
-  padding: 0;
-  min-height: 42px;
-}
-
-#modalReadyView,
-#modalResultView {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-#modalPlayView {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.judgeOverlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(15, 23, 42, 0.14);
-  z-index: 1100;
-  pointer-events: none;
-}
-
-.judgeOverlay.hidden {
-  display: none !important;
-}
-
-.judgeMark {
-  font-size: 96px;
-  line-height: 1;
-  font-weight: 800;
-  transform: scale(0.8);
-  animation: judgePop 0.38s ease;
-}
-
-.judgeOverlay.correct .judgeMark {
-  filter: drop-shadow(0 8px 18px rgba(6, 118, 71, 0.28));
-}
-
-.judgeOverlay.wrong .judgeMark {
-  filter: drop-shadow(0 8px 18px rgba(180, 35, 24, 0.28));
-}
-
-@keyframes judgePop {
-  0% {
-    opacity: 0;
-    transform: scale(0.45);
-  }
-  60% {
-    opacity: 1;
-    transform: scale(1.08);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@media (max-width: 640px) {
-  .heroHeader {
-    padding: 18px 14px 8px;
-  }
-
-  .container {
-    padding: 340px 14px 32px;
-  }
-
-  .summaryGrid,
-  .resultGrid,
-  .limitOptions {
-    grid-template-columns: 1fr;
-  }
-
-  .buttonRow {
-    flex-direction: column;
-  }
-
-  button {
-    width: 100%;
-  }
-
-  .value {
-    font-size: 24px;
-  }
-
-  .questionLabel {
-    font-size: 24px;
-  }
-
-  .answerInput {
-    font-size: 24px;
-  }
-
-  .modal {
-    padding: 10px;
-    align-items: flex-start;
-  }
-
-  .modalPlayableCard {
-    max-width: none;
-    margin: 0;
-    border-radius: 18px;
-    padding: 14px;
-  }
-
-  body::before {
-    background-position: center top;
-    background-size: cover;
-    opacity: 0.72;
-  }
-}
