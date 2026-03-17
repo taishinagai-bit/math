@@ -71,7 +71,7 @@ body::after {
 }
 
 .heroHeader {
-  padding: 22px 16px 8px;
+  padding: 20px 16px 6px;
 }
 
 .heroInner {
@@ -92,7 +92,7 @@ body::after {
 .container {
   max-width: 760px;
   margin: 0 auto;
-  padding: 360px 16px 36px;
+  padding: 300px 16px 36px;
 }
 
 .card {
@@ -128,12 +128,8 @@ body::after {
 
 .modeTabs {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 10px;
-}
-
-.singleColumn {
-  grid-template-columns: 1fr !important;
 }
 
 .modeSelectButton {
@@ -142,9 +138,9 @@ body::after {
   border-radius: 16px;
   background: var(--accent);
   color: #ffffff;
-  padding: 16px 14px;
-  min-height: 58px;
-  font-size: 18px;
+  padding: 14px 14px;
+  min-height: 54px;
+  font-size: 17px;
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
@@ -195,6 +191,237 @@ body::after {
   font-size: 16px;
   line-height: 1.45;
   font-weight: 700;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+button {
+  appearance: none;
+  border: none;
+  border-radius: 14px;
+  background: var(--accent);
+  color: #ffffff;
+  min-height: 50px;
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: var(--accent-weak);
+  color: var(--text);
+}
+
+.notice {
+  margin-top: 14px;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.notice:not(.subtle) {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.notice.subtle {
+  background: var(--info-bg);
+  color: var(--info-text);
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  background: rgba(15, 23, 42, 0.42);
+  z-index: 1000;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal.hidden {
+  display: none !important;
+}
+
+.modalPlayableCard {
+  width: 100%;
+  max-width: 560px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 22px;
+  box-shadow: var(--card-shadow-strong);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.compactModalHeader {
+  margin-bottom: 8px;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  flex: 1;
+}
+
+.iconButton {
+  appearance: none;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent-weak);
+  color: var(--text);
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  font-size: 24px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalGrid {
+  margin-top: 14px;
+}
+
+.limitBlock {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--card-soft);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.limitOptions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.limitOption {
+  min-height: 46px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text);
+  border: 1px solid #dde3ea;
+  font-size: 14px;
+  font-weight: 800;
+  width: 100%;
+}
+
+.limitOption.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+#modalReadyView,
+#modalPlayView,
+#modalResultView {
+  width: 100%;
+}
+
+.playStickyHeader {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.playScrollArea {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-top: 12px;
+  padding-bottom: 8px;
+  min-height: 220px;
+  flex: 1 1 auto;
+}
+
+.playBlock {
+  margin-top: 0;
+}
+
+.playTitleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.playModeName {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.playModeMeta {
+  font-size: 13px;
+  color: var(--sub);
+  font-weight: 700;
+}
+
+.limitMeterWrap {
+  margin-top: 6px;
+}
+
+.limitMeterLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--sub);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.limitMeterTrack {
+  width: 100%;
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.limitMeterBar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #ef4444, #f59e0b);
+  transform-origin: left center;
+  transition: transform 0.1s linear;
 }
 
 .quizForm {
@@ -265,73 +492,112 @@ body::after {
   color: #b42318;
 }
 
-.buttonRow {
-  display: flex;
-  gap: 10px;
-  margin-top: 16px;
-}
-
-button {
-  appearance: none;
-  border: none;
-  border-radius: 14px;
-  background: var(--accent);
-  color: #ffffff;
-  min-height: 52px;
-  padding: 14px 18px;
-  font-size: 16px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-button.secondary {
-  background: var(--accent-weak);
-  color: var(--text);
-}
-
-.notice {
-  margin-top: 14px;
-  border-radius: 14px;
-  padding: 12px 14px;
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.notice:not(.subtle) {
-  background: var(--success-bg);
-  color: var(--success-text);
-}
-
-.notice.subtle {
-  background: var(--info-bg);
-  color: var(--info-text);
-}
-
-.hidden {
-  display: none !important;
-}
-
-.modal {
+.judgeOverlay {
   position: fixed;
   inset: 0;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 16px;
-  background: rgba(15, 23, 42, 0.42);
-  z-index: 1000;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  background: rgba(15, 23, 42, 0.14);
+  z-index: 1100;
+  pointer-events: none;
 }
 
-.modal.hidden {
+.judgeOverlay.hidden {
   display: none !important;
 }
 
-.modalPlayableCard {
-  width: 100%;
-  max-width: 560px;
-  margin: auto 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+.judgeMark {
+  font-size: 96px;
+  line-height: 1;
+  font-weight: 800;
+  transform: scale(0.8);
+  animation: judgePop 0.38s ease;
+}
+
+.judgeOverlay.correct .judgeMark {
+  filter: drop-shadow(0 8px 18px rgba(6, 118, 71, 0.28));
+}
+
+.judgeOverlay.wrong .judgeMark {
+  filter: drop-shadow(0 8px 18px rgba(180, 35, 24, 0.28));
+}
+
+@keyframes judgePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 260px 14px 32px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .summaryGrid,
+  .resultGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .limitOptions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .buttonRow {
+    flex-direction: column;
+  }
+
+  .buttonRow button {
+    width: 100%;
+  }
+
+  .value {
+    font-size: 24px;
+  }
+
+  .questionLabel {
+    font-size: 24px;
+  }
+
+  .answerInput {
+    font-size: 24px;
+  }
+
+  .modal {
+    padding: 10px;
+    align-items: center;
+  }
+
+  .modalPlayableCard {
+    border-radius: 18px;
+    padding: 14px;
+  }
+
+  .modalHeader h2 {
+    font-size: 22px;
+  }
+
+  .iconButton {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+  }
+
+  body::before {
+    background-position: center top;
+    background-size: cover;
+  }
+}
