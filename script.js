@@ -1,458 +1,535 @@
-const STORAGE_KEY = "math-training-modal-internal-v1";
+* {
+  box-sizing: border-box;
+}
 
-const modeConfig = {
-  ten: {
-    name: "10問連続",
-    description: "足し算・引き算をテンポよく10問",
-    count: 10
-  },
-  carry: {
-    name: "繰り上がり特化",
-    description: "足し算の繰り上がりだけを集中練習",
-    count: 10
-  },
-  borrow: {
-    name: "繰り下がり特化",
-    description: "引き算の繰り下がりだけを集中練習",
-    count: 10
+:root {
+  --bg: #f3f5f9;
+  --card: #ffffff;
+  --card-soft: #f8fafc;
+  --text: #172033;
+  --sub: #6b7280;
+  --accent: #0f172a;
+  --accent-weak: #e5e7eb;
+  --success-bg: #ecfdf3;
+  --success-text: #067647;
+  --info-bg: #eff6ff;
+  --info-text: #1d4ed8;
+  --danger-bg: #fef2f2;
+  --danger-text: #b42318;
+  --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+body {
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 24px 16px 56px;
+}
+
+.header {
+  margin-bottom: 18px;
+}
+
+.header h1 {
+  margin: 0 0 8px;
+  font-size: 34px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.dateText {
+  margin: 0;
+  font-size: 14px;
+  color: var(--sub);
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.cardHeader {
+  margin-bottom: 12px;
+}
+
+.card h2 {
+  margin: 0 0 6px;
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+.subText {
+  margin: 0;
+  color: var(--sub);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.modeTabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.singleColumn {
+  grid-template-columns: 1fr !important;
+}
+
+.modeSelectButton {
+  appearance: none;
+  border: none;
+  border-radius: 16px;
+  background: var(--accent);
+  color: #ffffff;
+  padding: 16px 14px;
+  min-height: 58px;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.summaryGrid,
+.resultGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.summaryItem,
+.resultItem {
+  background: var(--card-soft);
+  border-radius: 16px;
+  padding: 14px;
+  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.compactGrid {
+  margin-bottom: 10px;
+}
+
+.compactItem {
+  min-height: 80px;
+}
+
+.label {
+  font-size: 13px;
+  color: var(--sub);
+  margin-bottom: 6px;
+}
+
+.value {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.smallValue {
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 700;
+}
+
+.quizForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.questionRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: center;
+  background: var(--card-soft);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.questionLabel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.questionNumber {
+  width: 100%;
+  font-size: 14px;
+  line-height: 1.3;
+  color: var(--sub);
+  font-weight: 700;
+}
+
+.answerInput {
+  width: 100%;
+  min-height: 64px;
+  border: 1px solid #d7dce4;
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 10px 12px;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  outline: none;
+}
+
+.answerInput:focus {
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.18);
+}
+
+.feedback {
+  min-height: 22px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.correct {
+  color: #067647;
+}
+
+.wrong {
+  color: #b42318;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+button {
+  appearance: none;
+  border: none;
+  border-radius: 14px;
+  background: var(--accent);
+  color: #ffffff;
+  min-height: 52px;
+  padding: 14px 18px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: var(--accent-weak);
+  color: var(--text);
+}
+
+.notice {
+  margin-top: 14px;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.notice:not(.subtle) {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.notice.subtle {
+  background: var(--info-bg);
+  color: var(--info-text);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.42);
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none !important;
+}
+
+.modalPlayableCard {
+  width: 100%;
+  max-width: 560px;
+  max-height: min(92vh, 820px);
+  overflow: hidden;
+  background: var(--card);
+  border-radius: 22px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.compactModalHeader {
+  margin-bottom: 8px;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.modalGrid {
+  margin-top: 14px;
+}
+
+.playStickyHeader {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--card);
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.playScrollArea {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-top: 12px;
+  padding-bottom: 8px;
+  min-height: 220px;
+  flex: 1 1 auto;
+}
+
+.playBlock {
+  margin-top: 0;
+}
+
+.playTitleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.playModeName {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.playModeMeta {
+  font-size: 13px;
+  color: var(--sub);
+  font-weight: 700;
+}
+
+.limitBlock {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--card-soft);
+}
+
+.limitOptions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.limitOption {
+  min-height: 44px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--text);
+  border: 1px solid #dde3ea;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.limitOption.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+.limitMeterWrap {
+  margin-top: 6px;
+}
+
+.limitMeterLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--sub);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.limitMeterTrack {
+  width: 100%;
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.limitMeterBar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #ef4444, #f59e0b);
+  transform-origin: left center;
+  transition: transform 0.1s linear;
+}
+
+.iconButton {
+  appearance: none;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent-weak);
+  color: var(--text);
+  width: 42px;
+  height: 42px;
+  font-size: 24px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  min-height: 42px;
+}
+
+.judgeOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.14);
+  z-index: 1100;
+  pointer-events: none;
+}
+
+.judgeOverlay.hidden {
+  display: none !important;
+}
+
+.judgeMark {
+  font-size: 96px;
+  line-height: 1;
+  font-weight: 800;
+  transform: scale(0.8);
+  animation: judgePop 0.38s ease;
+}
+
+.judgeOverlay.correct .judgeMark {
+  filter: drop-shadow(0 8px 18px rgba(6, 118, 71, 0.28));
+}
+
+.judgeOverlay.wrong .judgeMark {
+  filter: drop-shadow(0 8px 18px rgba(180, 35, 24, 0.28));
+}
+
+@keyframes judgePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.45);
   }
-};
-
-const dateTextEl = document.getElementById("dateText");
-
-const modeSelectButtons = Array.from(document.querySelectorAll(".modeSelectButton"));
-
-const modeModalEl = document.getElementById("modeModal");
-const closeModalButtonEl = document.getElementById("closeModalButton");
-const modalStartButtonEl = document.getElementById("modalStartButton");
-const modalRetryButtonEl = document.getElementById("modalRetryButton");
-const modalCloseAfterResultButtonEl = document.getElementById("modalCloseAfterResultButton");
-
-const modalModeNameEl = document.getElementById("modalModeName");
-const modalModeDescriptionEl = document.getElementById("modalModeDescription");
-const modalBestTimeEl = document.getElementById("modalBestTime");
-const modalLastRecordEl = document.getElementById("modalLastRecord");
-
-const modalReadyViewEl = document.getElementById("modalReadyView");
-const modalPlayViewEl = document.getElementById("modalPlayView");
-const modalResultViewEl = document.getElementById("modalResultView");
-
-const modalTimerEl = document.getElementById("modalTimer");
-const modalProgressEl = document.getElementById("modalProgress");
-const modalPlayDescriptionEl = document.getElementById("modalPlayDescription");
-const modalQuizFormEl = document.getElementById("modalQuizForm");
-
-const resultCorrectCountEl = document.getElementById("resultCorrectCount");
-const resultFinalTimeEl = document.getElementById("resultFinalTime");
-const resultAverageTimeEl = document.getElementById("resultAverageTime");
-const resultComparisonTextEl = document.getElementById("resultComparisonText");
-const resultBestUpdateEl = document.getElementById("resultBestUpdate");
-const resultSpeedRatingEl = document.getElementById("resultSpeedRating");
-
-const judgeOverlayEl = document.getElementById("judgeOverlay");
-const judgeMarkEl = document.getElementById("judgeMark");
-
-const today = new Date();
-const yyyy = today.getFullYear();
-const mm = String(today.getMonth() + 1).padStart(2, "0");
-const dd = String(today.getDate()).padStart(2, "0");
-const todayKey = `${yyyy}-${mm}-${dd}`;
-
-if (dateTextEl) {
-  dateTextEl.textContent = `今日: ${yyyy}/${mm}/${dd}`;
-}
-
-let currentMode = "ten";
-let questions = [];
-let currentQuestionIndex = 0;
-let correctCount = 0;
-let startTime = 0;
-let timerId = null;
-let started = false;
-let isLocked = false;
-
-function loadData() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return { todayCounts: {}, bestTimes: {}, lastResults: {} };
-    }
-    return JSON.parse(raw);
-  } catch (error) {
-    return { todayCounts: {}, bestTimes: {}, lastResults: {} };
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
-function saveData(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-
-function getTodayCount(mode) {
-  const data = loadData();
-  return data.todayCounts?.[todayKey]?.[mode] || 0;
-}
-
-function incrementTodayCount(mode) {
-  const data = loadData();
-  if (!data.todayCounts[todayKey]) data.todayCounts[todayKey] = {};
-  data.todayCounts[todayKey][mode] = (data.todayCounts[todayKey][mode] || 0) + 1;
-  saveData(data);
-}
-
-function getBestTime(mode) {
-  const data = loadData();
-  return data.bestTimes?.[mode] || null;
-}
-
-function setBestTime(mode, ms) {
-  const data = loadData();
-  const currentBest = data.bestTimes?.[mode] || null;
-  let updated = false;
-
-  if (currentBest === null || ms < currentBest) {
-    data.bestTimes[mode] = ms;
-    updated = true;
+@media (max-width: 640px) {
+  .container {
+    padding: 18px 14px 48px;
   }
 
-  saveData(data);
-  return updated;
-}
-
-function getLastResult(mode) {
-  const data = loadData();
-  return data.lastResults?.[mode] || null;
-}
-
-function setLastResult(mode, result) {
-  const data = loadData();
-  data.lastResults[mode] = result;
-  saveData(data);
-}
-
-function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function formatTime(ms) {
-  const totalSeconds = Math.floor(ms / 1000);
-  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
-  const seconds = String(totalSeconds % 60).padStart(2, "0");
-  return `${minutes}:${seconds}`;
-}
-
-function formatLastRecord(mode) {
-  const last = getLastResult(mode);
-  if (!last) return "未記録";
-  return `${last.correct}/${last.total}問 ・ ${formatTime(last.totalMs)} ・ ${last.avgSec.toFixed(1)}秒/問`;
-}
-
-function getSpeedText(avgSec) {
-  if (avgSec < 1.0) return "かなり速い";
-  if (avgSec < 2.0) return "速い";
-  if (avgSec < 3.0) return "標準";
-  return "伸びしろあり";
-}
-
-function makeAdd() {
-  const a = randInt(11, 79);
-  const b = randInt(11, 29);
-  return { text: `${a} + ${b}`, answer: a + b };
-}
-
-function makeSub() {
-  const a = randInt(40, 99);
-  const b = randInt(11, 39);
-  const top = Math.max(a, b + 10);
-  const bottom = Math.min(b, top - 10);
-  return { text: `${top} - ${bottom}`, answer: top - bottom };
-}
-
-function makeCarry() {
-  let a, b;
-  do {
-    a = randInt(15, 79);
-    b = randInt(15, 79);
-  } while ((a % 10) + (b % 10) < 10);
-  return { text: `${a} + ${b}`, answer: a + b };
-}
-
-function makeBorrow() {
-  let a, b;
-  do {
-    a = randInt(30, 99);
-    b = randInt(11, a - 1);
-  } while ((a % 10) >= (b % 10));
-  return { text: `${a} - ${b}`, answer: a - b };
-}
-
-function createQuestion(mode) {
-  if (mode === "carry") return makeCarry();
-  if (mode === "borrow") return makeBorrow();
-  return Math.random() < 0.5 ? makeAdd() : makeSub();
-}
-
-function generateQuestions() {
-  questions = [];
-  const count = modeConfig[currentMode].count;
-
-  for (let i = 0; i < count; i++) {
-    questions.push(createQuestion(currentMode));
+  .header h1 {
+    font-size: 28px;
   }
 
-  currentQuestionIndex = 0;
-  correctCount = 0;
-  isLocked = false;
-}
-
-function getAnswerDigits(answer) {
-  return String(Math.abs(answer)).length;
-}
-
-function updateModalInfo(mode) {
-  if (modalModeNameEl) modalModeNameEl.textContent = modeConfig[mode].name;
-  if (modalModeDescriptionEl) modalModeDescriptionEl.textContent = modeConfig[mode].description;
-  if (modalPlayDescriptionEl) modalPlayDescriptionEl.textContent = modeConfig[mode].description;
-
-  const best = getBestTime(mode);
-  if (modalBestTimeEl) modalBestTimeEl.textContent = best ? formatTime(best) : "未記録";
-  if (modalLastRecordEl) modalLastRecordEl.textContent = formatLastRecord(mode);
-}
-
-function openModeModal(mode) {
-  currentMode = mode;
-  updateModalInfo(mode);
-  showReadyView();
-  if (modeModalEl) modeModalEl.classList.remove("hidden");
-}
-
-function closeModeModal() {
-  stopTimer();
-  started = false;
-  if (modeModalEl) modeModalEl.classList.add("hidden");
-}
-
-function showReadyView() {
-  if (modalReadyViewEl) modalReadyViewEl.classList.remove("hidden");
-  if (modalPlayViewEl) modalPlayViewEl.classList.add("hidden");
-  if (modalResultViewEl) modalResultViewEl.classList.add("hidden");
-}
-
-function showPlayView() {
-  if (modalReadyViewEl) modalReadyViewEl.classList.add("hidden");
-  if (modalPlayViewEl) modalPlayViewEl.classList.remove("hidden");
-  if (modalResultViewEl) modalResultViewEl.classList.add("hidden");
-}
-
-function showResultView() {
-  if (modalReadyViewEl) modalReadyViewEl.classList.add("hidden");
-  if (modalPlayViewEl) modalPlayViewEl.classList.add("hidden");
-  if (modalResultViewEl) modalResultViewEl.classList.remove("hidden");
-}
-
-function updateProgress() {
-  if (!modalProgressEl) return;
-  modalProgressEl.textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
-}
-
-function renderCurrentQuestion() {
-  if (!modalQuizFormEl) return;
-
-  const q = questions[currentQuestionIndex];
-  if (!q) return;
-
-  modalQuizFormEl.innerHTML = `
-    <div class="questionRow">
-      <label class="questionLabel" for="answerInput">
-        <span class="questionNumber">問${currentQuestionIndex + 1}</span>
-        <span>${q.text} = </span>
-      </label>
-      <input
-        id="answerInput"
-        class="answerInput"
-        type="number"
-        inputmode="numeric"
-        autocomplete="off"
-      />
-      <div id="feedbackText" class="feedback"></div>
-    </div>
-  `;
-
-  const input = document.getElementById("answerInput");
-  if (input) {
-    input.focus();
-    input.addEventListener("input", handleAutoSubmit);
+  .summaryGrid,
+  .resultGrid,
+  .limitOptions {
+    grid-template-columns: 1fr;
   }
 
-  updateProgress();
-}
-
-function startTimer() {
-  startTime = Date.now();
-  if (modalTimerEl) modalTimerEl.textContent = "00:00";
-
-  if (timerId) clearInterval(timerId);
-
-  timerId = setInterval(() => {
-    if (modalTimerEl && started) {
-      modalTimerEl.textContent = formatTime(Date.now() - startTime);
-    }
-  }, 100);
-}
-
-function stopTimer() {
-  if (timerId) {
-    clearInterval(timerId);
-    timerId = null;
-  }
-}
-
-function startSession() {
-  generateQuestions();
-  started = true;
-  showPlayView();
-  startTimer();
-  renderCurrentQuestion();
-}
-
-function showJudge(isCorrect) {
-  if (!judgeOverlayEl || !judgeMarkEl) return;
-
-  judgeOverlayEl.classList.remove("hidden", "correct", "wrong");
-  judgeOverlayEl.classList.add(isCorrect ? "correct" : "wrong");
-  judgeMarkEl.textContent = isCorrect ? "⭕️" : "✖️";
-}
-
-function hideJudge() {
-  if (!judgeOverlayEl) return;
-  judgeOverlayEl.classList.add("hidden");
-  judgeOverlayEl.classList.remove("correct", "wrong");
-}
-
-function makeComparisonText(mode, totalMs) {
-  const last = getLastResult(mode);
-  if (!last) return "初回記録";
-
-  const diffMs = totalMs - last.totalMs;
-  const diffSec = Math.abs(diffMs / 1000).toFixed(1);
-
-  if (diffMs < 0) return `前回より速い！ (${diffSec}秒短縮)`;
-  if (diffMs > 0) return `前回より少しゆっくり (${diffSec}秒)`;
-  return "前回と同じタイム";
-}
-
-function finalizeResult() {
-  started = false;
-  stopTimer();
-
-  const totalMs = Date.now() - startTime;
-  const total = questions.length;
-  const avgSec = totalMs / 1000 / total;
-
-  incrementTodayCount(currentMode);
-
-  const isPerfect = correctCount === total;
-  const comparisonMessage = makeComparisonText(currentMode, totalMs);
-
-  let bestUpdated = false;
-  if (isPerfect) {
-    bestUpdated = setBestTime(currentMode, totalMs);
+  .buttonRow {
+    flex-direction: column;
   }
 
-  setLastResult(currentMode, {
-    correct: correctCount,
-    total,
-    totalMs,
-    avgSec
-  });
-
-  if (resultCorrectCountEl) resultCorrectCountEl.textContent = `${correctCount}/${total}`;
-  if (resultFinalTimeEl) resultFinalTimeEl.textContent = formatTime(totalMs);
-  if (resultAverageTimeEl) resultAverageTimeEl.textContent = `${avgSec.toFixed(1)}秒/問`;
-  if (resultComparisonTextEl) resultComparisonTextEl.textContent = comparisonMessage;
-
-  if (resultBestUpdateEl) {
-    if (bestUpdated) {
-      resultBestUpdateEl.textContent = "ベスト更新！";
-      resultBestUpdateEl.classList.remove("hidden");
-    } else {
-      resultBestUpdateEl.classList.add("hidden");
-    }
+  button {
+    width: 100%;
   }
 
-  if (resultSpeedRatingEl) {
-    resultSpeedRatingEl.textContent = `速度評価: ${getSpeedText(avgSec)}`;
-    resultSpeedRatingEl.classList.remove("hidden");
+  .value {
+    font-size: 24px;
   }
 
-  updateModalInfo(currentMode);
-  showResultView();
-}
-
-function goNextQuestion() {
-  currentQuestionIndex += 1;
-
-  if (currentQuestionIndex >= questions.length) {
-    finalizeResult();
-    return;
+  .questionLabel {
+    font-size: 24px;
   }
 
-  renderCurrentQuestion();
-  isLocked = false;
-}
-
-function handleAutoSubmit(event) {
-  if (!started || isLocked) return;
-
-  const input = event.target;
-  const q = questions[currentQuestionIndex];
-  const requiredDigits = getAnswerDigits(q.answer);
-  const currentValue = input.value.replace("-", "");
-
-  if (currentValue.length < requiredDigits) return;
-
-  isLocked = true;
-
-  const numericValue = Number(input.value);
-  const isCorrect = numericValue === q.answer;
-
-  if (isCorrect) {
-    correctCount += 1;
+  .answerInput {
+    font-size: 24px;
   }
 
-  showJudge(isCorrect);
+  .modal {
+    padding: 10px;
+    align-items: stretch;
+  }
 
-  setTimeout(() => {
-    hideJudge();
-    goNextQuestion();
-  }, 420);
-}
-
-modeSelectButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    openModeModal(button.dataset.mode);
-  });
-});
-
-if (closeModalButtonEl) {
-  closeModalButtonEl.addEventListener("click", closeModeModal);
-}
-
-if (modalStartButtonEl) {
-  modalStartButtonEl.addEventListener("click", startSession);
-}
-
-if (modalRetryButtonEl) {
-  modalRetryButtonEl.addEventListener("click", startSession);
-}
-
-if (modalCloseAfterResultButtonEl) {
-  modalCloseAfterResultButtonEl.addEventListener("click", closeModeModal);
-}
-
-if (modeModalEl) {
-  modeModalEl.addEventListener("click", (event) => {
-    if (event.target === modeModalEl) {
-      closeModeModal();
-    }
-  });
+  .modalPlayableCard {
+    max-width: none;
+    max-height: calc(100vh - 20px);
+    border-radius: 18px;
+    padding: 14px;
+  }
 }
