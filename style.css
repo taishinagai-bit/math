@@ -3,9 +3,9 @@
 }
 
 :root {
-  --bg: #f3f5f9;
+  --bg: #eef2f7;
   --card: rgba(255, 255, 255, 0.90);
-  --card-soft: rgba(248, 250, 252, 0.84);
+  --card-soft: rgba(248, 250, 252, 0.86);
   --text: #172033;
   --sub: #6b7280;
   --accent: #0f172a;
@@ -14,14 +14,11 @@
   --success-text: #067647;
   --info-bg: #eff6ff;
   --info-text: #1d4ed8;
-  --danger-bg: #fef2f2;
-  --danger-text: #b42318;
-  --shadow: 0 10px 30px rgba(15, 23, 42, 0.10);
-  --card-shadow-strong: 0 16px 36px rgba(15, 23, 42, 0.14);
-  --logo-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
-  --radius-lg: 22px;
+  --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
+  --card-shadow-strong: 0 18px 40px rgba(15, 23, 42, 0.14);
+  --logo-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+  --radius-lg: 24px;
   --radius-md: 16px;
-  --radius-sm: 12px;
 }
 
 html,
@@ -44,19 +41,21 @@ body {
   min-height: 100vh;
 }
 
+/* 背景はしっかり見せる */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   background-image: url("mascot-bg.PNG");
   background-repeat: no-repeat;
-  background-position: center 84px;
-  background-size: min(94vw, 760px) auto;
-  opacity: 0.22;
+  background-position: center 70px;
+  background-size: min(100vw, 820px) auto;
+  opacity: 0.34;
   pointer-events: none;
   z-index: 0;
 }
 
+/* 白被せは弱めにして背景を残す */
 body::after {
   content: "";
   position: fixed;
@@ -64,9 +63,9 @@ body::after {
   background:
     linear-gradient(
       to bottom,
-      rgba(243, 245, 249, 0.50) 0%,
-      rgba(243, 245, 249, 0.30) 34%,
-      rgba(243, 245, 249, 0.44) 100%
+      rgba(238, 242, 247, 0.26) 0%,
+      rgba(238, 242, 247, 0.12) 40%,
+      rgba(238, 242, 247, 0.20) 100%
     );
   pointer-events: none;
   z-index: 0;
@@ -79,40 +78,42 @@ body::after {
   z-index: 1;
 }
 
-.floatingHeader {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+/* ロゴ専用エリア */
+.heroHeader {
+  position: relative;
   z-index: 2;
+  padding: 22px 16px 10px;
+}
+
+.heroInner {
+  max-width: 760px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 8px 16px 6px;
-  pointer-events: none;
+  align-items: flex-start;
 }
 
 .titleLogo {
   display: block;
-  width: min(68vw, 285px);
+  width: min(70vw, 300px);
   height: auto;
-  margin: 0 auto 4px;
+  margin: 0 auto 10px;
   filter: drop-shadow(var(--logo-shadow));
-  pointer-events: none;
+  align-self: center;
 }
 
 .dateText {
   margin: 0;
   font-size: 14px;
   color: var(--sub);
-  font-weight: 700;
-  pointer-events: none;
+  font-weight: 800;
 }
 
+/* メニューはロゴの下から開始 */
 .container {
   max-width: 760px;
   margin: 0 auto;
-  padding: 118px 16px 32px;
+  padding: 190px 16px 36px;
 }
 
 .card {
@@ -123,9 +124,13 @@ body::after {
   -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius-lg);
   box-shadow: var(--card-shadow-strong);
+  border: 1px solid rgba(255, 255, 255, 0.55);
   padding: 18px;
-  margin-bottom: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  margin-bottom: 16px;
+}
+
+.homeCard {
+  margin-top: 0;
 }
 
 .cardHeader {
@@ -257,7 +262,7 @@ body::after {
   min-height: 64px;
   border: 1px solid #d7dce4;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.97);
   padding: 10px 12px;
   text-align: center;
   font-size: 28px;
@@ -352,7 +357,7 @@ button.secondary {
   width: 100%;
   max-width: 560px;
   margin: auto 0;
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: 22px;
@@ -390,7 +395,7 @@ button.secondary {
   position: sticky;
   top: 0;
   z-index: 2;
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   padding-bottom: 10px;
@@ -565,16 +570,17 @@ button.secondary {
 }
 
 @media (max-width: 640px) {
-  .floatingHeader {
-    padding: 6px 14px 4px;
+  .heroHeader {
+    padding: 18px 14px 8px;
   }
 
   .titleLogo {
-    width: min(68vw, 270px);
+    width: min(72vw, 300px);
+    margin: 0 auto 8px;
   }
 
   .container {
-    padding: 108px 14px 32px;
+    padding: 176px 14px 32px;
   }
 
   .summaryGrid,
@@ -616,8 +622,8 @@ button.secondary {
   }
 
   body::before {
-    background-position: center 78px;
-    background-size: min(100vw, 700px) auto;
-    opacity: 0.22;
+    background-position: center 58px;
+    background-size: min(108vw, 760px) auto;
+    opacity: 0.34;
   }
 }
