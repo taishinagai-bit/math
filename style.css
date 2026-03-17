@@ -4,8 +4,8 @@
 
 :root {
   --bg: #f3f5f9;
-  --card: rgba(255, 255, 255, 0.82);
-  --card-soft: rgba(248, 250, 252, 0.78);
+  --card: rgba(255, 255, 255, 0.84);
+  --card-soft: rgba(248, 250, 252, 0.80);
   --text: #172033;
   --sub: #6b7280;
   --accent: #0f172a;
@@ -48,7 +48,7 @@ body::before {
   inset: 0;
   background-image: url("mascot-bg.PNG");
   background-repeat: no-repeat;
-  background-position: center 120px;
+  background-position: center 88px;
   background-size: min(94vw, 760px) auto;
   opacity: 0.22;
   pointer-events: none;
@@ -62,9 +62,9 @@ body::after {
   background:
     linear-gradient(
       to bottom,
-      rgba(243, 245, 249, 0.55) 0%,
-      rgba(243, 245, 249, 0.35) 38%,
-      rgba(243, 245, 249, 0.50) 100%
+      rgba(243, 245, 249, 0.52) 0%,
+      rgba(243, 245, 249, 0.34) 36%,
+      rgba(243, 245, 249, 0.48) 100%
     );
   pointer-events: none;
   z-index: 0;
@@ -80,23 +80,23 @@ body::after {
 .container {
   max-width: 760px;
   margin: 0 auto;
-  padding: 12px 16px 40px;
+  padding: 6px 16px 32px;
 }
 
 .header {
-  margin-bottom: 10px;
+  margin-bottom: 4px;
 }
 
 .titleLogo {
   display: block;
-  width: min(78vw, 340px);
+  width: min(68vw, 285px);
   height: auto;
-  margin: 0 auto 8px;
+  margin: 0 auto 4px;
   filter: drop-shadow(0 6px 14px rgba(15, 23, 42, 0.10));
 }
 
 .dateText {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: 14px;
   color: var(--sub);
   font-weight: 700;
@@ -109,7 +109,7 @@ body::after {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   padding: 18px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .cardHeader {
@@ -340,7 +340,7 @@ button.secondary {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: 22px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+  box-shadow: var(--shadow);
   padding: 18px;
   display: flex;
   flex-direction: column;
@@ -550,12 +550,12 @@ button.secondary {
 
 @media (max-width: 640px) {
   .container {
-    padding: 12px 14px 40px;
+    padding: 6px 14px 32px;
   }
 
   .titleLogo {
-    width: min(78vw, 320px);
-    margin: 0 auto 8px;
+    width: min(68vw, 280px);
+    margin: 0 auto 4px;
   }
 
   .summaryGrid,
@@ -597,7 +597,7 @@ button.secondary {
   }
 
   body::before {
-    background-position: center 110px;
+    background-position: center 82px;
     background-size: min(100vw, 700px) auto;
     opacity: 0.22;
   }
