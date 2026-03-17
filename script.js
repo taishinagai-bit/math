@@ -1,4 +1,4 @@
-const STORAGE_KEY = "math-training-modal-internal-v2";
+const STORAGE_KEY = "math-training-modal-internal-v3";
 
 const modeConfig = {
   ten: {
@@ -86,15 +86,25 @@ let perQuestionFrameId = null;
 let perQuestionTimeoutId = null;
 
 let audioEnabled = true;
+let audioUnlocked = false;
 
 const correctSound = new Audio("correct.mp3");
 const wrongSound = new Audio("wrong.mp3");
+const menuBgm = new Audio("menu-bgm.mp3");
+const playBgm = new Audio("play-bgm.mp3");
 
 correctSound.preload = "auto";
 wrongSound.preload = "auto";
+menuBgm.preload = "auto";
+playBgm.preload = "auto";
 
 correctSound.volume = 0.75;
 wrongSound.volume = 0.75;
+menuBgm.volume = 0.35;
+playBgm.volume = 0.4;
+
+menuBgm.loop = true;
+playBgm.loop = true;
 
 function makeRecordKey(mode, limit) {
   return `${mode}__limit_${limit}`;
@@ -104,28 +114,56 @@ function getLimitLabel(limit) {
   return limit === 0 ? "制限なし" : `${limit}秒`;
 }
 
+function primeAudio(audio) {
+  try {
+    audio.play().then(() => {
+      audio.pause();
+      audio.currentTime = 0;
+    }).catch(() => {});
+  } catch (error) {
+    // noop
+  }
+}
+
 function unlockAudio() {
-  if (!audioEnabled) return;
+  if (!audioEnabled || audioUnlocked) return;
+  audioUnlocked = true;
 
-  correctSound.play().then(() => {
-    correctSound.pause();
-    correctSound.currentTime = 0;
-  }).catch(() => {});
+  primeAudio(correctSound);
+  primeAudio(wrongSound);
+  primeAudio(menuBgm);
+  primeAudio(playBgm);
+}
 
-  wrongSound.play().then(() => {
-    wrongSound.pause();
-    wrongSound.currentTime = 0;
-  }).catch(() => {});
+function stopAllBgm() {
+  menuBgm.pause();
+  playBgm.pause();
+  menuBgm.currentTime = 0;
+  playBgm.currentTime = 0;
+}
+
+function playMenuBgm() {
+  if (!audioEnabled || !audioUnlocked) return;
+  playBgm.pause();
+  playBgm.currentTime = 0;
+  menuBgm.play().catch(() => {});
+}
+
+function playPlayBgm() {
+  if (!audioEnabled || !audioUnlocked) return;
+  menuBgm.pause();
+  menuBgm.currentTime = 0;
+  playBgm.play().catch(() => {});
 }
 
 function playCorrectSound() {
-  if (!audioEnabled) return;
+  if (!audioEnabled || !audioUnlocked) return;
   correctSound.currentTime = 0;
   correctSound.play().catch(() => {});
 }
 
 function playWrongSound() {
-  if (!audioEnabled) return;
+  if (!audioEnabled || !audioUnlocked) return;
   wrongSound.currentTime = 0;
   wrongSound.play().catch(() => {});
 }
@@ -133,6 +171,7 @@ function playWrongSound() {
 function bindInitialAudioUnlock() {
   const unlockOnce = () => {
     unlockAudio();
+    playMenuBgm();
     document.removeEventListener("touchstart", unlockOnce);
     document.removeEventListener("click", unlockOnce);
   };
@@ -304,6 +343,7 @@ function updateLimitButtons(limit) {
 
 function openModeModal(mode) {
   currentMode = mode;
+  stopAllBgm();
   updateModalInfo(currentMode, currentLimit);
   updateLimitButtons(currentLimit);
   showReadyView();
@@ -317,7 +357,9 @@ function closeModeModal() {
   stopTimer();
   stopPerQuestionLimit();
   started = false;
+  stopAllBgm();
   if (modeModalEl) modeModalEl.classList.add("hidden");
+  playMenuBgm();
 }
 
 function showReadyView() {
@@ -457,6 +499,8 @@ function startPerQuestionLimit() {
 function startSession() {
   generateQuestions();
   started = true;
+  stopAllBgm();
+  playPlayBgm();
   showPlayView();
   updateModalInfo(currentMode, currentLimit);
   updateLimitMeterVisibility();
