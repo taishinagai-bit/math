@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>毎日の計算トレーニング</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -29,12 +29,12 @@
 
   <div id="modeModal" class="modal hidden">
     <div class="modalCard modalPlayableCard">
-      <div class="modalHeader">
-        <h2 id="modalModeName">10問連続</h2>
-        <button id="closeModalButton" type="button" class="iconButton" aria-label="閉じる">×</button>
-      </div>
-
       <div id="modalReadyView">
+        <div class="modalHeader">
+          <h2 id="modalModeName">10問連続</h2>
+          <button id="closeModalButton" type="button" class="iconButton" aria-label="閉じる">×</button>
+        </div>
+
         <p id="modalModeDescription" class="subText"></p>
 
         <div class="summaryGrid modalGrid">
@@ -48,36 +48,72 @@
           </div>
         </div>
 
+        <div class="limitBlock">
+          <div class="label">リミット設定</div>
+          <div class="limitOptions">
+            <button class="limitOption active" data-limit="0" type="button">制限なし</button>
+            <button class="limitOption" data-limit="1" type="button">1秒</button>
+            <button class="limitOption" data-limit="2" type="button">2秒</button>
+            <button class="limitOption" data-limit="3" type="button">3秒</button>
+            <button class="limitOption" data-limit="4" type="button">4秒</button>
+            <button class="limitOption" data-limit="5" type="button">5秒</button>
+          </div>
+        </div>
+
         <div class="buttonRow">
           <button id="modalStartButton" type="button">スタート</button>
         </div>
       </div>
 
       <div id="modalPlayView" class="hidden">
-        <div class="summaryGrid compactGrid">
-          <div class="summaryItem compactItem">
-            <div class="label">タイム</div>
-            <div id="modalTimer" class="value">00:00</div>
+        <div class="playStickyHeader">
+          <div class="modalHeader compactModalHeader">
+            <div class="playTitleGroup">
+              <div id="playModeName" class="playModeName">10問連続</div>
+              <div id="playModeMeta" class="playModeMeta">制限なし</div>
+            </div>
+            <button id="closePlayModalButton" type="button" class="iconButton" aria-label="閉じる">×</button>
           </div>
-          <div class="summaryItem compactItem">
-            <div class="label">進行</div>
-            <div id="modalProgress" class="value">1 / 10</div>
+
+          <div class="summaryGrid compactGrid">
+            <div class="summaryItem compactItem">
+              <div class="label">タイム</div>
+              <div id="modalTimer" class="value">00:00</div>
+            </div>
+            <div class="summaryItem compactItem">
+              <div class="label">進行</div>
+              <div id="modalProgress" class="value">1 / 10</div>
+            </div>
+          </div>
+
+          <div id="limitMeterWrap" class="limitMeterWrap hidden">
+            <div class="limitMeterLabel">
+              <span>リミット</span>
+              <span id="limitMeterText">3.0秒</span>
+            </div>
+            <div class="limitMeterTrack">
+              <div id="limitMeterBar" class="limitMeterBar"></div>
+            </div>
           </div>
         </div>
 
-        <div class="playBlock">
-          <p id="modalPlayDescription" class="subText"></p>
-          <form id="modalQuizForm" class="quizForm"></form>
+        <div class="playScrollArea">
+          <div class="playBlock">
+            <p id="modalPlayDescription" class="subText"></p>
+            <form id="modalQuizForm" class="quizForm"></form>
+          </div>
         </div>
       </div>
 
       <div id="modalResultView" class="hidden">
-        <div class="cardHeader">
+        <div class="modalHeader">
           <h2>結果</h2>
-          <p class="subText">今回の記録です</p>
+          <button id="modalCloseAfterResultButtonTop" type="button" class="iconButton" aria-label="閉じる">×</button>
         </div>
 
-        <div class="resultGrid">
+        <p class="subText">今回の記録です</p>
+
+        <div class="resultGrid modalGrid">
           <div class="resultItem">
             <div class="label">正解数</div>
             <div id="resultCorrectCount" class="value"></div>
