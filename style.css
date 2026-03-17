@@ -4,7 +4,7 @@
 
 :root {
   --bg: #eef2f7;
-  --card: rgba(255, 255, 255, 0.92);
+  --card: rgba(255, 255, 255, 0.9);
   --card-soft: rgba(248, 250, 252, 0.88);
   --text: #172033;
   --sub: #6b7280;
@@ -14,7 +14,9 @@
   --success-text: #067647;
   --info-bg: #eff6ff;
   --info-text: #1d4ed8;
-  --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
+  --danger-bg: #fef2f2;
+  --danger-text: #b42318;
+  --shadow: 0 12px 30px rgba(15, 23, 42, 0.1);
   --card-shadow-strong: 0 18px 40px rgba(15, 23, 42, 0.14);
   --radius-lg: 24px;
   --radius-md: 16px;
@@ -57,42 +59,22 @@ body::after {
   content: "";
   position: fixed;
   inset: 0;
-  background: rgba(238, 242, 247, 0.18);
+  background: rgba(238, 242, 247, 0.16);
   pointer-events: none;
   z-index: 0;
 }
 
 .container,
 .modal,
-.judgeOverlay,
-.heroHeader {
+.judgeOverlay {
   position: relative;
   z-index: 1;
-}
-
-.heroHeader {
-  padding: 20px 16px 6px;
-}
-
-.heroInner {
-  max-width: 760px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: flex-start;
-}
-
-.dateText {
-  margin: 0;
-  font-size: 14px;
-  color: #5f697c;
-  font-weight: 800;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .container {
   max-width: 760px;
   margin: 0 auto;
-  padding: 300px 16px 36px;
+  padding: 250px 16px 28px;
 }
 
 .card {
@@ -104,43 +86,43 @@ body::after {
   border-radius: var(--radius-lg);
   box-shadow: var(--card-shadow-strong);
   border: 1px solid rgba(255, 255, 255, 0.52);
-  padding: 18px;
+  padding: 16px;
   margin-bottom: 16px;
 }
 
 .cardHeader {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .card h2 {
-  margin: 0 0 6px;
-  font-size: 24px;
-  line-height: 1.25;
+  margin: 0 0 4px;
+  font-size: 22px;
+  line-height: 1.2;
   font-weight: 800;
 }
 
 .subText {
   margin: 0;
   color: var(--sub);
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .modeTabs {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 10px;
+  gap: 8px;
 }
 
 .modeSelectButton {
   appearance: none;
   border: none;
-  border-radius: 16px;
+  border-radius: 14px;
   background: var(--accent);
   color: #ffffff;
-  padding: 14px 14px;
-  min-height: 54px;
-  font-size: 17px;
+  padding: 12px 14px;
+  min-height: 48px;
+  font-size: 16px;
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
@@ -205,9 +187,9 @@ button {
   border-radius: 14px;
   background: var(--accent);
   color: #ffffff;
-  min-height: 50px;
+  min-height: 48px;
   padding: 12px 18px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
   cursor: pointer;
 }
@@ -272,7 +254,7 @@ button.secondary {
 
 .modalHeader {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 10px;
@@ -287,6 +269,7 @@ button.secondary {
   font-size: 24px;
   font-weight: 800;
   flex: 1;
+  min-width: 0;
 }
 
 .iconButton {
@@ -305,6 +288,7 @@ button.secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .modalGrid {
@@ -380,6 +364,7 @@ button.secondary {
   flex-direction: column;
   gap: 2px;
   flex: 1;
+  min-width: 0;
 }
 
 .playModeName {
@@ -584,6 +569,10 @@ button.secondary {
   .modalPlayableCard {
     border-radius: 18px;
     padding: 14px;
+  }
+
+  .modalHeader {
+    align-items: center;
   }
 
   .modalHeader h2 {
