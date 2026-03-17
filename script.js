@@ -1,4 +1,4 @@
-const STORAGE_KEY = "math-training-modal-v2";
+const STORAGE_KEY = "math-training-modal-internal-v1";
 
 const modeConfig = {
   ten: {
@@ -20,39 +20,34 @@ const modeConfig = {
 
 const dateTextEl = document.getElementById("dateText");
 
-const homeScreenEl = document.getElementById("homeScreen");
-const playScreenEl = document.getElementById("playScreen");
-
 const modeSelectButtons = Array.from(document.querySelectorAll(".modeSelectButton"));
 
-const modeNameEl = document.getElementById("modeName");
-const modeDescriptionEl = document.getElementById("modeDescription");
-const timerEl = document.getElementById("timer");
-const todayCountEl = document.getElementById("todayCount");
-const bestTimeEl = document.getElementById("bestTime");
-const progressTextEl = document.getElementById("progressText");
-const quizFormEl = document.getElementById("quizForm");
-
-const resultEmptyEl = document.getElementById("resultEmpty");
-const resultPanelEl = document.getElementById("resultPanel");
-const correctCountEl = document.getElementById("correctCount");
-const finalTimeEl = document.getElementById("finalTime");
-const averageTimeEl = document.getElementById("averageTime");
-const comparisonTextEl = document.getElementById("comparisonText");
-const bestUpdateEl = document.getElementById("bestUpdate");
-const speedRatingEl = document.getElementById("speedRating");
-
-const retryButtonEl = document.getElementById("retryButton");
-const backToHomeButtonEl = document.getElementById("backToHomeButton");
-const resultHomeButtonEl = document.getElementById("resultHomeButton");
-
 const modeModalEl = document.getElementById("modeModal");
+const closeModalButtonEl = document.getElementById("closeModalButton");
+const modalStartButtonEl = document.getElementById("modalStartButton");
+const modalRetryButtonEl = document.getElementById("modalRetryButton");
+const modalCloseAfterResultButtonEl = document.getElementById("modalCloseAfterResultButton");
+
 const modalModeNameEl = document.getElementById("modalModeName");
 const modalModeDescriptionEl = document.getElementById("modalModeDescription");
 const modalBestTimeEl = document.getElementById("modalBestTime");
 const modalLastRecordEl = document.getElementById("modalLastRecord");
-const modalStartButtonEl = document.getElementById("modalStartButton");
-const closeModalButtonEl = document.getElementById("closeModalButton");
+
+const modalReadyViewEl = document.getElementById("modalReadyView");
+const modalPlayViewEl = document.getElementById("modalPlayView");
+const modalResultViewEl = document.getElementById("modalResultView");
+
+const modalTimerEl = document.getElementById("modalTimer");
+const modalProgressEl = document.getElementById("modalProgress");
+const modalPlayDescriptionEl = document.getElementById("modalPlayDescription");
+const modalQuizFormEl = document.getElementById("modalQuizForm");
+
+const resultCorrectCountEl = document.getElementById("resultCorrectCount");
+const resultFinalTimeEl = document.getElementById("resultFinalTime");
+const resultAverageTimeEl = document.getElementById("resultAverageTime");
+const resultComparisonTextEl = document.getElementById("resultComparisonText");
+const resultBestUpdateEl = document.getElementById("resultBestUpdate");
+const resultSpeedRatingEl = document.getElementById("resultSpeedRating");
 
 const judgeOverlayEl = document.getElementById("judgeOverlay");
 const judgeMarkEl = document.getElementById("judgeMark");
@@ -68,7 +63,6 @@ if (dateTextEl) {
 }
 
 let currentMode = "ten";
-let selectedMode = null;
 let questions = [];
 let currentQuestionIndex = 0;
 let correctCount = 0;
@@ -214,18 +208,59 @@ function getAnswerDigits(answer) {
   return String(Math.abs(answer)).length;
 }
 
+function updateModalInfo(mode) {
+  if (modalModeNameEl) modalModeNameEl.textContent = modeConfig[mode].name;
+  if (modalModeDescriptionEl) modalModeDescriptionEl.textContent = modeConfig[mode].description;
+  if (modalPlayDescriptionEl) modalPlayDescriptionEl.textContent = modeConfig[mode].description;
+
+  const best = getBestTime(mode);
+  if (modalBestTimeEl) modalBestTimeEl.textContent = best ? formatTime(best) : "未記録";
+  if (modalLastRecordEl) modalLastRecordEl.textContent = formatLastRecord(mode);
+}
+
+function openModeModal(mode) {
+  currentMode = mode;
+  updateModalInfo(mode);
+  showReadyView();
+  if (modeModalEl) modeModalEl.classList.remove("hidden");
+}
+
+function closeModeModal() {
+  stopTimer();
+  started = false;
+  if (modeModalEl) modeModalEl.classList.add("hidden");
+}
+
+function showReadyView() {
+  if (modalReadyViewEl) modalReadyViewEl.classList.remove("hidden");
+  if (modalPlayViewEl) modalPlayViewEl.classList.add("hidden");
+  if (modalResultViewEl) modalResultViewEl.classList.add("hidden");
+}
+
+function showPlayView() {
+  if (modalReadyViewEl) modalReadyViewEl.classList.add("hidden");
+  if (modalPlayViewEl) modalPlayViewEl.classList.remove("hidden");
+  if (modalResultViewEl) modalResultViewEl.classList.add("hidden");
+}
+
+function showResultView() {
+  if (modalReadyViewEl) modalReadyViewEl.classList.add("hidden");
+  if (modalPlayViewEl) modalPlayViewEl.classList.add("hidden");
+  if (modalResultViewEl) modalResultViewEl.classList.remove("hidden");
+}
+
 function updateProgress() {
-  if (!progressTextEl) return;
-  progressTextEl.textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
+  if (!modalProgressEl) return;
+  modalProgressEl.textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
 }
 
 function renderCurrentQuestion() {
-  if (!quizFormEl) return;
+  if (!modalQuizFormEl) return;
 
   const q = questions[currentQuestionIndex];
   if (!q) return;
 
-  quizFormEl.innerHTML = `
+  modalQuizFormEl.innerHTML = `
     <div class="questionRow">
       <label class="questionLabel" for="answerInput">
         <span class="questionNumber">問${currentQuestionIndex + 1}</span>
@@ -253,13 +288,13 @@ function renderCurrentQuestion() {
 
 function startTimer() {
   startTime = Date.now();
-  if (timerEl) timerEl.textContent = "00:00";
+  if (modalTimerEl) modalTimerEl.textContent = "00:00";
 
   if (timerId) clearInterval(timerId);
 
   timerId = setInterval(() => {
-    if (timerEl && started) {
-      timerEl.textContent = formatTime(Date.now() - startTime);
+    if (modalTimerEl && started) {
+      modalTimerEl.textContent = formatTime(Date.now() - startTime);
     }
   }, 100);
 }
@@ -271,73 +306,10 @@ function stopTimer() {
   }
 }
 
-function updatePlayStats() {
-  if (modeNameEl) modeNameEl.textContent = modeConfig[currentMode].name;
-  if (modeDescriptionEl) modeDescriptionEl.textContent = modeConfig[currentMode].description;
-  if (todayCountEl) todayCountEl.textContent = `${getTodayCount(currentMode)}回`;
-
-  const best = getBestTime(currentMode);
-  if (bestTimeEl) {
-    bestTimeEl.textContent = best ? formatTime(best) : "未記録";
-  }
-}
-
-function resetResultView() {
-  if (resultEmptyEl) resultEmptyEl.classList.remove("hidden");
-  if (resultPanelEl) resultPanelEl.classList.add("hidden");
-  if (bestUpdateEl) bestUpdateEl.classList.add("hidden");
-  if (speedRatingEl) speedRatingEl.classList.add("hidden");
-}
-
-function openModeModal(mode) {
-  selectedMode = mode;
-
-  if (modalModeNameEl) modalModeNameEl.textContent = modeConfig[mode].name;
-  if (modalModeDescriptionEl) modalModeDescriptionEl.textContent = modeConfig[mode].description;
-
-  const best = getBestTime(mode);
-  if (modalBestTimeEl) {
-    modalBestTimeEl.textContent = best ? formatTime(best) : "未記録";
-  }
-
-  if (modalLastRecordEl) {
-    modalLastRecordEl.textContent = formatLastRecord(mode);
-  }
-
-  if (modeModalEl) {
-    modeModalEl.classList.remove("hidden");
-  }
-}
-
-function closeModeModal() {
-  selectedMode = null;
-  if (modeModalEl) {
-    modeModalEl.classList.add("hidden");
-  }
-}
-
-function showHome() {
-  started = false;
-  stopTimer();
-
-  if (homeScreenEl) homeScreenEl.classList.remove("hidden");
-  if (playScreenEl) playScreenEl.classList.add("hidden");
-  closeModeModal();
-}
-
-function showPlayScreen() {
-  if (homeScreenEl) homeScreenEl.classList.add("hidden");
-  if (playScreenEl) playScreenEl.classList.remove("hidden");
-}
-
-function startSession(mode) {
-  currentMode = mode;
-  closeModeModal();
-  showPlayScreen();
-  updatePlayStats();
-  resetResultView();
+function startSession() {
   generateQuestions();
   started = true;
+  showPlayView();
   startTimer();
   renderCurrentQuestion();
 }
@@ -393,28 +365,27 @@ function finalizeResult() {
     avgSec
   });
 
-  if (resultEmptyEl) resultEmptyEl.classList.add("hidden");
-  if (resultPanelEl) resultPanelEl.classList.remove("hidden");
-  if (correctCountEl) correctCountEl.textContent = `${correctCount}/${total}`;
-  if (finalTimeEl) finalTimeEl.textContent = formatTime(totalMs);
-  if (averageTimeEl) averageTimeEl.textContent = `${avgSec.toFixed(1)}秒/問`;
-  if (comparisonTextEl) comparisonTextEl.textContent = comparisonMessage;
+  if (resultCorrectCountEl) resultCorrectCountEl.textContent = `${correctCount}/${total}`;
+  if (resultFinalTimeEl) resultFinalTimeEl.textContent = formatTime(totalMs);
+  if (resultAverageTimeEl) resultAverageTimeEl.textContent = `${avgSec.toFixed(1)}秒/問`;
+  if (resultComparisonTextEl) resultComparisonTextEl.textContent = comparisonMessage;
 
-  if (bestUpdateEl) {
+  if (resultBestUpdateEl) {
     if (bestUpdated) {
-      bestUpdateEl.textContent = "ベスト更新！";
-      bestUpdateEl.classList.remove("hidden");
+      resultBestUpdateEl.textContent = "ベスト更新！";
+      resultBestUpdateEl.classList.remove("hidden");
     } else {
-      bestUpdateEl.classList.add("hidden");
+      resultBestUpdateEl.classList.add("hidden");
     }
   }
 
-  if (speedRatingEl) {
-    speedRatingEl.textContent = `速度評価: ${getSpeedText(avgSec)}`;
-    speedRatingEl.classList.remove("hidden");
+  if (resultSpeedRatingEl) {
+    resultSpeedRatingEl.textContent = `速度評価: ${getSpeedText(avgSec)}`;
+    resultSpeedRatingEl.classList.remove("hidden");
   }
 
-  updatePlayStats();
+  updateModalInfo(currentMode);
+  showResultView();
 }
 
 function goNextQuestion() {
@@ -462,15 +433,20 @@ modeSelectButtons.forEach((button) => {
   });
 });
 
-if (modalStartButtonEl) {
-  modalStartButtonEl.addEventListener("click", () => {
-    if (!selectedMode) return;
-    startSession(selectedMode);
-  });
-}
-
 if (closeModalButtonEl) {
   closeModalButtonEl.addEventListener("click", closeModeModal);
+}
+
+if (modalStartButtonEl) {
+  modalStartButtonEl.addEventListener("click", startSession);
+}
+
+if (modalRetryButtonEl) {
+  modalRetryButtonEl.addEventListener("click", startSession);
+}
+
+if (modalCloseAfterResultButtonEl) {
+  modalCloseAfterResultButtonEl.addEventListener("click", closeModeModal);
 }
 
 if (modeModalEl) {
@@ -480,19 +456,3 @@ if (modeModalEl) {
     }
   });
 }
-
-if (retryButtonEl) {
-  retryButtonEl.addEventListener("click", () => {
-    startSession(currentMode);
-  });
-}
-
-if (backToHomeButtonEl) {
-  backToHomeButtonEl.addEventListener("click", showHome);
-}
-
-if (resultHomeButtonEl) {
-  resultHomeButtonEl.addEventListener("click", showHome);
-}
-
-showHome();
