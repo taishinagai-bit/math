@@ -49,7 +49,7 @@
           </div>
         </div>
 
-        <div class="limitBlock">
+        <div id="normalLimitBlock" class="limitBlock">
           <div class="label">リミット設定</div>
           <div class="limitOptions">
             <button class="limitOption active" data-limit="0" type="button">制限なし</button>
@@ -58,6 +58,24 @@
             <button class="limitOption" data-limit="3" type="button">3秒</button>
             <button class="limitOption" data-limit="4" type="button">4秒</button>
             <button class="limitOption" data-limit="5" type="button">5秒</button>
+          </div>
+        </div>
+
+        <div id="survivalDifficultyBlock" class="limitBlock hidden">
+          <div class="label">難易度選択</div>
+          <div class="difficultyOptions">
+            <button class="difficultyOption active" data-difficulty="easy" type="button">
+              <span class="difficultyName">イージー</span>
+              <span class="difficultyMeta">❤️❤️❤️ / 5秒</span>
+            </button>
+            <button class="difficultyOption" data-difficulty="normal" type="button">
+              <span class="difficultyName">ノーマル</span>
+              <span class="difficultyMeta">❤️❤️ / 4秒</span>
+            </button>
+            <button class="difficultyOption" data-difficulty="hard" type="button">
+              <span class="difficultyName">ハード</span>
+              <span class="difficultyMeta">❤️ / 3秒</span>
+            </button>
           </div>
         </div>
 
@@ -84,6 +102,17 @@
             <div class="summaryItem compactItem">
               <div class="label">進行</div>
               <div id="modalProgress" class="value">1 / 10</div>
+            </div>
+          </div>
+
+          <div id="survivalHud" class="survivalHud hidden">
+            <div class="survivalHudItem">
+              <span class="survivalHudLabel">ライフ</span>
+              <span id="survivalLives" class="survivalHudValue">❤️❤️❤️</span>
+            </div>
+            <div class="survivalHudItem">
+              <span class="survivalHudLabel">正解数</span>
+              <span id="survivalScore" class="survivalHudValue">0</span>
             </div>
           </div>
 
@@ -116,7 +145,7 @@
 
         <div class="resultGrid modalGrid">
           <div class="resultItem">
-            <div class="label">正解数</div>
+            <div class="label">結果</div>
             <div id="resultCorrectCount" class="value"></div>
           </div>
           <div class="resultItem">
