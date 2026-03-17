@@ -1,4 +1,4 @@
-const STORAGE_KEY = "math-training-modal-internal-v3";
+const STORAGE_KEY = "math-training-modal-internal-v4";
 
 const modeConfig = {
   ten: {
@@ -144,16 +144,30 @@ function stopAllBgm() {
 
 function playMenuBgm() {
   if (!audioEnabled || !audioUnlocked) return;
-  playBgm.pause();
-  playBgm.currentTime = 0;
-  menuBgm.play().catch(() => {});
+
+  if (!playBgm.paused) {
+    playBgm.pause();
+    playBgm.currentTime = 0;
+  }
+
+  if (menuBgm.paused) {
+    menuBgm.currentTime = 0;
+    menuBgm.play().catch(() => {});
+  }
 }
 
 function playPlayBgm() {
   if (!audioEnabled || !audioUnlocked) return;
-  menuBgm.pause();
-  menuBgm.currentTime = 0;
-  playBgm.play().catch(() => {});
+
+  if (!menuBgm.paused) {
+    menuBgm.pause();
+    menuBgm.currentTime = 0;
+  }
+
+  if (playBgm.paused) {
+    playBgm.currentTime = 0;
+    playBgm.play().catch(() => {});
+  }
 }
 
 function playCorrectSound() {
@@ -342,11 +356,14 @@ function updateLimitButtons(limit) {
 }
 
 function openModeModal(mode) {
+  unlockAudio();
+  playMenuBgm();
+
   currentMode = mode;
-  stopAllBgm();
   updateModalInfo(currentMode, currentLimit);
   updateLimitButtons(currentLimit);
   showReadyView();
+
   if (modeModalEl) {
     modeModalEl.classList.remove("hidden");
     modeModalEl.scrollTop = 0;
@@ -357,8 +374,11 @@ function closeModeModal() {
   stopTimer();
   stopPerQuestionLimit();
   started = false;
-  stopAllBgm();
-  if (modeModalEl) modeModalEl.classList.add("hidden");
+
+  if (modeModalEl) {
+    modeModalEl.classList.add("hidden");
+  }
+
   playMenuBgm();
 }
 
@@ -497,9 +517,9 @@ function startPerQuestionLimit() {
 }
 
 function startSession() {
+  unlockAudio();
   generateQuestions();
   started = true;
-  stopAllBgm();
   playPlayBgm();
   showPlayView();
   updateModalInfo(currentMode, currentLimit);
