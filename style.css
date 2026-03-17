@@ -758,3 +758,47 @@ button.secondary {
     font-size: 28px;
   }
 }
+@media (max-width: 640px) {
+  .modal {
+    align-items: flex-start;
+    padding-top: max(12px, env(safe-area-inset-top));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .modalPlayableCard {
+    margin-top: 8px;
+    margin-bottom: 24px;
+  }
+
+  .survivalResultHero {
+    margin-top: 8px;
+    margin-bottom: 10px;
+    padding: 12px;
+  }
+
+  .survivalResultScore {
+    font-size: 24px;
+  }
+
+  .resultGrid {
+    gap: 10px;
+  }
+
+  .resultItem {
+    min-height: 72px;
+    padding: 12px;
+  }
+
+  .value {
+    font-size: 22px;
+  }
+
+  .smallValue {
+    font-size: 15px;
+  }
+
+  .buttonRow {
+    margin-top: 12px;
+    padding-bottom: 6px;
+  }
+}
