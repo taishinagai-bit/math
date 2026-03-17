@@ -517,3 +517,99 @@ button.secondary {
   position: fixed;
   inset: 0;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.14);
+  z-index: 1100;
+  pointer-events: none;
+}
+
+.judgeOverlay.hidden {
+  display: none !important;
+}
+
+.judgeMark {
+  font-size: 96px;
+  line-height: 1;
+  font-weight: 800;
+  transform: scale(0.8);
+  animation: judgePop 0.38s ease;
+}
+
+.judgeOverlay.correct .judgeMark {
+  filter: drop-shadow(0 8px 18px rgba(6, 118, 71, 0.28));
+}
+
+.judgeOverlay.wrong .judgeMark {
+  filter: drop-shadow(0 8px 18px rgba(180, 35, 24, 0.28));
+}
+
+@keyframes judgePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 8px 14px 32px;
+  }
+
+  .titleLogo {
+    width: min(68vw, 280px);
+    margin: 0 auto 6px;
+  }
+
+  .summaryGrid,
+  .resultGrid,
+  .limitOptions {
+    grid-template-columns: 1fr;
+  }
+
+  .buttonRow {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .value {
+    font-size: 24px;
+  }
+
+  .questionLabel {
+    font-size: 24px;
+  }
+
+  .answerInput {
+    font-size: 24px;
+  }
+
+  .modal {
+    padding: 10px;
+    align-items: flex-start;
+  }
+
+  .modalPlayableCard {
+    max-width: none;
+    margin: 0;
+    border-radius: 18px;
+    padding: 14px;
+  }
+
+  body::before {
+    background-position: center 78px;
+    background-size: min(100vw, 700px) auto;
+    opacity: 0.22;
+  }
+}
