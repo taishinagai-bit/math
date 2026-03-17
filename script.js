@@ -1,4 +1,4 @@
-const STORAGE_KEY = "math-training-modal-v1";
+const STORAGE_KEY = "math-training-modal-v2";
 
 const modeConfig = {
   ten: {
