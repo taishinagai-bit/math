@@ -4,7 +4,7 @@
 
 :root {
   --bg: #eef2f7;
-  --card: rgba(255, 255, 255, 0.92);
+  --card: rgba(255, 255, 255, 0.9);
   --card-soft: rgba(248, 250, 252, 0.88);
   --text: #172033;
   --sub: #6b7280;
@@ -14,7 +14,9 @@
   --success-text: #067647;
   --info-bg: #eff6ff;
   --info-text: #1d4ed8;
-  --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
+  --danger-bg: #fef2f2;
+  --danger-text: #b42318;
+  --shadow: 0 12px 30px rgba(15, 23, 42, 0.1);
   --card-shadow-strong: 0 18px 40px rgba(15, 23, 42, 0.14);
   --radius-lg: 24px;
   --radius-md: 16px;
@@ -73,21 +75,21 @@ body::after {
   min-height: 100vh;
   max-width: 760px;
   margin: 0 auto;
-  padding: 0 16px 24px;
+  padding: 0 16px 32px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .homePanel {
   width: 100%;
-  background: rgba(255, 255, 255, 0.90);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-radius: var(--radius-lg);
+  border-radius: 24px;
   box-shadow: var(--card-shadow-strong);
   border: 1px solid rgba(255, 255, 255, 0.52);
   padding: 16px;
-  margin-bottom: 18px;
+  margin-top: 120px;
 }
 
 .modePicker {
@@ -557,12 +559,13 @@ button.secondary {
 
 @media (max-width: 640px) {
   .container {
-    padding: 0 14px 22px;
+    padding: 0 14px 24px;
+    align-items: center;
   }
 
   .homePanel {
-    margin-bottom: 14px;
     padding: 14px;
+    margin-top: 110px;
   }
 
   .modePicker {
