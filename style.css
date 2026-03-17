@@ -278,11 +278,13 @@ button.secondary {
   position: fixed;
   inset: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 16px;
   background: rgba(15, 23, 42, 0.42);
   z-index: 1000;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal.hidden {
@@ -292,14 +294,15 @@ button.secondary {
 .modalPlayableCard {
   width: 100%;
   max-width: 560px;
-  max-height: min(92vh, 820px);
-  overflow: hidden;
+  margin: auto 0;
   background: var(--card);
   border-radius: 22px;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
   padding: 18px;
   display: flex;
   flex-direction: column;
+  max-height: none;
+  overflow: visible;
 }
 
 .modalHeader {
@@ -440,6 +443,18 @@ button.secondary {
   min-height: 42px;
 }
 
+#modalReadyView,
+#modalResultView {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#modalPlayView {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .judgeOverlay {
   position: fixed;
   inset: 0;
@@ -523,12 +538,12 @@ button.secondary {
 
   .modal {
     padding: 10px;
-    align-items: stretch;
+    align-items: flex-start;
   }
 
   .modalPlayableCard {
     max-width: none;
-    max-height: calc(100vh - 20px);
+    margin: 0;
     border-radius: 18px;
     padding: 14px;
   }
