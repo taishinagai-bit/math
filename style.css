@@ -4,8 +4,8 @@
 
 :root {
   --bg: #eef2f7;
-  --card: rgba(255, 255, 255, 0.90);
-  --card-soft: rgba(248, 250, 252, 0.86);
+  --card: rgba(255, 255, 255, 0.92);
+  --card-soft: rgba(248, 250, 252, 0.88);
   --text: #172033;
   --sub: #6b7280;
   --accent: #0f172a;
@@ -16,7 +16,6 @@
   --info-text: #1d4ed8;
   --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
   --card-shadow-strong: 0 18px 40px rgba(15, 23, 42, 0.14);
-  --logo-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
   --radius-lg: 24px;
   --radius-md: 16px;
 }
@@ -41,96 +40,77 @@ body {
   min-height: 100vh;
 }
 
-/* 背景はしっかり見せる */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   background-image: url("mascot-bg.PNG");
   background-repeat: no-repeat;
-  background-position: center 70px;
-  background-size: min(100vw, 820px) auto;
-  opacity: 0.34;
+  background-position: center top;
+  background-size: cover;
+  opacity: 0.72;
   pointer-events: none;
   z-index: 0;
 }
 
-/* 白被せは弱めにして背景を残す */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(238, 242, 247, 0.26) 0%,
-      rgba(238, 242, 247, 0.12) 40%,
-      rgba(238, 242, 247, 0.20) 100%
-    );
+  background: linear-gradient(
+    to bottom,
+    rgba(238, 242, 247, 0.08) 0%,
+    rgba(238, 242, 247, 0.04) 40%,
+    rgba(238, 242, 247, 0.10) 100%
+  );
   pointer-events: none;
   z-index: 0;
 }
 
 .container,
 .modal,
-.judgeOverlay {
+.judgeOverlay,
+.heroHeader {
   position: relative;
   z-index: 1;
 }
 
-/* ロゴ専用エリア */
 .heroHeader {
-  position: relative;
-  z-index: 2;
-  padding: 22px 16px 10px;
+  padding: 22px 16px 8px;
 }
 
 .heroInner {
   max-width: 760px;
   margin: 0 auto;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.titleLogo {
-  display: block;
-  width: min(70vw, 300px);
-  height: auto;
-  margin: 0 auto 10px;
-  filter: drop-shadow(var(--logo-shadow));
-  align-self: center;
+  justify-content: flex-start;
 }
 
 .dateText {
   margin: 0;
   font-size: 14px;
-  color: var(--sub);
+  color: #5f697c;
   font-weight: 800;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.40);
 }
 
-/* メニューはロゴの下から開始 */
 .container {
   max-width: 760px;
   margin: 0 auto;
-  padding: 190px 16px 36px;
+  padding: 360px 16px 36px;
 }
 
 .card {
   position: relative;
-  z-index: 3;
+  z-index: 2;
   background: var(--card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: var(--radius-lg);
   box-shadow: var(--card-shadow-strong);
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.52);
   padding: 18px;
   margin-bottom: 16px;
-}
-
-.homeCard {
-  margin-top: 0;
 }
 
 .cardHeader {
@@ -574,13 +554,8 @@ button.secondary {
     padding: 18px 14px 8px;
   }
 
-  .titleLogo {
-    width: min(72vw, 300px);
-    margin: 0 auto 8px;
-  }
-
   .container {
-    padding: 176px 14px 32px;
+    padding: 340px 14px 32px;
   }
 
   .summaryGrid,
@@ -622,8 +597,8 @@ button.secondary {
   }
 
   body::before {
-    background-position: center 58px;
-    background-size: min(108vw, 760px) auto;
-    opacity: 0.34;
+    background-position: center top;
+    background-size: cover;
+    opacity: 0.72;
   }
 }
