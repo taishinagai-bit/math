@@ -1,4 +1,6 @@
-const STORAGE_KEY = "math-training-modal-internal-v4";
+const STORAGE_KEY = "math-training-modal-c-layout-v1";
+
+const modeOrder = ["ten", "carry", "borrow"];
 
 const modeConfig = {
   ten: {
@@ -18,9 +20,12 @@ const modeConfig = {
   }
 };
 
-const dateTextEl = document.getElementById("dateText");
+const currentModeNameEl = document.getElementById("currentModeName");
+const currentModeDescriptionEl = document.getElementById("currentModeDescription");
+const prevModeButtonEl = document.getElementById("prevModeButton");
+const nextModeButtonEl = document.getElementById("nextModeButton");
+const openSelectedModeButtonEl = document.getElementById("openSelectedModeButton");
 
-const modeSelectButtons = Array.from(document.querySelectorAll(".modeSelectButton"));
 const limitOptionButtons = Array.from(document.querySelectorAll(".limitOption"));
 
 const modeModalEl = document.getElementById("modeModal");
@@ -61,16 +66,6 @@ const resultSpeedRatingEl = document.getElementById("resultSpeedRating");
 const judgeOverlayEl = document.getElementById("judgeOverlay");
 const judgeMarkEl = document.getElementById("judgeMark");
 
-const today = new Date();
-const yyyy = today.getFullYear();
-const mm = String(today.getMonth() + 1).padStart(2, "0");
-const dd = String(today.getDate()).padStart(2, "0");
-const todayKey = `${yyyy}-${mm}-${dd}`;
-
-if (dateTextEl) {
-  dateTextEl.textContent = `今日: ${yyyy}/${mm}/${dd}`;
-}
-
 let currentMode = "ten";
 let currentLimit = 0;
 let questions = [];
@@ -106,50 +101,28 @@ playBgm.volume = 0.4;
 menuBgm.loop = true;
 playBgm.loop = true;
 
-function makeRecordKey(mode, limit) {
-  return `${mode}__limit_${limit}`;
-}
-
-function getLimitLabel(limit) {
-  return limit === 0 ? "制限なし" : `${limit}秒`;
-}
-
 function primeAudio(audio) {
   try {
     audio.play().then(() => {
       audio.pause();
       audio.currentTime = 0;
     }).catch(() => {});
-  } catch (error) {
-    // noop
-  }
+  } catch (error) {}
 }
 
 function unlockAudio() {
   if (!audioEnabled || audioUnlocked) return;
   audioUnlocked = true;
-
   primeAudio(correctSound);
   primeAudio(wrongSound);
   primeAudio(menuBgm);
   primeAudio(playBgm);
 }
 
-function stopAllBgm() {
-  menuBgm.pause();
-  playBgm.pause();
-  menuBgm.currentTime = 0;
-  playBgm.currentTime = 0;
-}
-
 function playMenuBgm() {
   if (!audioEnabled || !audioUnlocked) return;
-
-  if (!playBgm.paused) {
-    playBgm.pause();
-    playBgm.currentTime = 0;
-  }
-
+  playBgm.pause();
+  playBgm.currentTime = 0;
   if (menuBgm.paused) {
     menuBgm.currentTime = 0;
     menuBgm.play().catch(() => {});
@@ -158,12 +131,8 @@ function playMenuBgm() {
 
 function playPlayBgm() {
   if (!audioEnabled || !audioUnlocked) return;
-
-  if (!menuBgm.paused) {
-    menuBgm.pause();
-    menuBgm.currentTime = 0;
-  }
-
+  menuBgm.pause();
+  menuBgm.currentTime = 0;
   if (playBgm.paused) {
     playBgm.currentTime = 0;
     playBgm.play().catch(() => {});
@@ -194,34 +163,28 @@ function bindInitialAudioUnlock() {
   document.addEventListener("click", unlockOnce, { once: true });
 }
 
+function makeRecordKey(mode, limit) {
+  return `${mode}__limit_${limit}`;
+}
+
+function getLimitLabel(limit) {
+  return limit === 0 ? "制限なし" : `${limit}秒`;
+}
+
 function loadData() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      return { todayCounts: {}, bestTimes: {}, lastResults: {} };
+      return { bestTimes: {}, lastResults: {} };
     }
     return JSON.parse(raw);
   } catch (error) {
-    return { todayCounts: {}, bestTimes: {}, lastResults: {} };
+    return { bestTimes: {}, lastResults: {} };
   }
 }
 
 function saveData(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-
-function getTodayCount(mode, limit) {
-  const key = makeRecordKey(mode, limit);
-  const data = loadData();
-  return data.todayCounts?.[todayKey]?.[key] || 0;
-}
-
-function incrementTodayCount(mode, limit) {
-  const key = makeRecordKey(mode, limit);
-  const data = loadData();
-  if (!data.todayCounts[todayKey]) data.todayCounts[todayKey] = {};
-  data.todayCounts[todayKey][key] = (data.todayCounts[todayKey][key] || 0) + 1;
-  saveData(data);
 }
 
 function getBestTime(mode, limit) {
@@ -258,10 +221,6 @@ function setLastResult(mode, limit, result) {
   saveData(data);
 }
 
-function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 function formatTime(ms) {
   const totalSeconds = Math.floor(ms / 1000);
   const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
@@ -280,6 +239,10 @@ function getSpeedText(avgSec) {
   if (avgSec < 2.0) return "速い";
   if (avgSec < 3.0) return "標準";
   return "伸びしろあり";
+}
+
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function makeAdd() {
@@ -337,6 +300,25 @@ function getAnswerDigits(answer) {
   return String(Math.abs(answer)).length;
 }
 
+function updateHomeModeDisplay() {
+  if (currentModeNameEl) currentModeNameEl.textContent = modeConfig[currentMode].name;
+  if (currentModeDescriptionEl) currentModeDescriptionEl.textContent = modeConfig[currentMode].description;
+}
+
+function goPrevMode() {
+  const index = modeOrder.indexOf(currentMode);
+  const nextIndex = (index - 1 + modeOrder.length) % modeOrder.length;
+  currentMode = modeOrder[nextIndex];
+  updateHomeModeDisplay();
+}
+
+function goNextMode() {
+  const index = modeOrder.indexOf(currentMode);
+  const nextIndex = (index + 1) % modeOrder.length;
+  currentMode = modeOrder[nextIndex];
+  updateHomeModeDisplay();
+}
+
 function updateModalInfo(mode, limit) {
   if (modalModeNameEl) modalModeNameEl.textContent = modeConfig[mode].name;
   if (modalModeDescriptionEl) modalModeDescriptionEl.textContent = modeConfig[mode].description;
@@ -355,33 +337,6 @@ function updateLimitButtons(limit) {
   });
 }
 
-function openModeModal(mode) {
-  unlockAudio();
-  playMenuBgm();
-
-  currentMode = mode;
-  updateModalInfo(currentMode, currentLimit);
-  updateLimitButtons(currentLimit);
-  showReadyView();
-
-  if (modeModalEl) {
-    modeModalEl.classList.remove("hidden");
-    modeModalEl.scrollTop = 0;
-  }
-}
-
-function closeModeModal() {
-  stopTimer();
-  stopPerQuestionLimit();
-  started = false;
-
-  if (modeModalEl) {
-    modeModalEl.classList.add("hidden");
-  }
-
-  playMenuBgm();
-}
-
 function showReadyView() {
   if (modalReadyViewEl) modalReadyViewEl.classList.remove("hidden");
   if (modalPlayViewEl) modalPlayViewEl.classList.add("hidden");
@@ -398,6 +353,31 @@ function showResultView() {
   if (modalReadyViewEl) modalReadyViewEl.classList.add("hidden");
   if (modalPlayViewEl) modalPlayViewEl.classList.add("hidden");
   if (modalResultViewEl) modalResultViewEl.classList.remove("hidden");
+}
+
+function openModeModal(mode) {
+  unlockAudio();
+  playMenuBgm();
+  currentMode = mode;
+  updateHomeModeDisplay();
+  updateModalInfo(currentMode, currentLimit);
+  updateLimitButtons(currentLimit);
+  showReadyView();
+
+  if (modeModalEl) {
+    modeModalEl.classList.remove("hidden");
+  }
+}
+
+function closeModeModal() {
+  stopTimer();
+  stopPerQuestionLimit();
+  started = false;
+  playMenuBgm();
+
+  if (modeModalEl) {
+    modeModalEl.classList.add("hidden");
+  }
 }
 
 function updateProgress() {
@@ -563,8 +543,6 @@ function finalizeResult() {
   const total = questions.length;
   const avgSec = totalMs / 1000 / total;
 
-  incrementTodayCount(currentMode, currentLimit);
-
   const isPerfect = correctCount === total;
   const comparisonMessage = makeComparisonText(currentMode, currentLimit, totalMs);
 
@@ -654,11 +632,19 @@ function handleAutoSubmit(event) {
   lockAndJudge(isCorrect);
 }
 
-modeSelectButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    openModeModal(button.dataset.mode);
+if (prevModeButtonEl) {
+  prevModeButtonEl.addEventListener("click", goPrevMode);
+}
+
+if (nextModeButtonEl) {
+  nextModeButtonEl.addEventListener("click", goNextMode);
+}
+
+if (openSelectedModeButtonEl) {
+  openSelectedModeButtonEl.addEventListener("click", () => {
+    openModeModal(currentMode);
   });
-});
+}
 
 limitOptionButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -700,4 +686,5 @@ if (modeModalEl) {
   });
 }
 
+updateHomeModeDisplay();
 bindInitialAudioUnlock();
