@@ -1,7 +1,6 @@
 const STORAGE_KEY = "math-training-modal-c-layout-v2";
 
 const modeOrder = ["ten", "carry", "borrow", "survival"];
-const survivalDifficultyOrder = ["easy", "normal", "hard"];
 
 const modeConfig = {
   ten: {
@@ -94,6 +93,11 @@ const resultAverageTimeEl = document.getElementById("resultAverageTime");
 const resultComparisonTextEl = document.getElementById("resultComparisonText");
 const resultBestUpdateEl = document.getElementById("resultBestUpdate");
 const resultSpeedRatingEl = document.getElementById("resultSpeedRating");
+
+const survivalResultHeroEl = document.getElementById("survivalResultHero");
+const survivalResultRankEl = document.getElementById("survivalResultRank");
+const survivalResultScoreEl = document.getElementById("survivalResultScore");
+const survivalResultCommentEl = document.getElementById("survivalResultComment");
 
 const judgeOverlayEl = document.getElementById("judgeOverlay");
 const judgeMarkEl = document.getElementById("judgeMark");
@@ -200,12 +204,12 @@ function bindInitialAudioUnlock() {
   document.addEventListener("click", unlockOnce, { once: true });
 }
 
-function makeRecordKey(mode, limit, difficulty = "") {
-  return `${mode}__limit_${limit}__difficulty_${difficulty}`;
-}
-
 function isSurvivalMode(mode = currentMode) {
   return mode === "survival";
+}
+
+function makeRecordKey(mode, limit, difficulty = "") {
+  return `${mode}__limit_${limit}__difficulty_${difficulty}`;
 }
 
 function getLimitLabel(limit) {
@@ -236,26 +240,22 @@ function saveData(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-function getRecordKeyForCurrentMode() {
-  if (isSurvivalMode()) {
-    return makeRecordKey(currentMode, survivalDifficultyConfig[currentSurvivalDifficulty].limit, currentSurvivalDifficulty);
-  }
-  return makeRecordKey(currentMode, currentLimit, "");
-}
-
-function getBestTime(mode, limit, difficulty = "") {
+function getBestRecord(mode, limit, difficulty = "") {
   const key = makeRecordKey(mode, limit, difficulty);
   const data = loadData();
-  return data.bestTimes?.[key] || null;
+  return data.bestTimes?.[key] ?? null;
 }
 
-function setBestTime(mode, limit, difficulty, value) {
+function setBestRecord(mode, limit, difficulty, value, preferLower = false) {
   const key = makeRecordKey(mode, limit, difficulty);
   const data = loadData();
-  const currentBest = data.bestTimes?.[key] || null;
+  const currentBest = data.bestTimes?.[key] ?? null;
   let updated = false;
 
-  if (currentBest === null || value > currentBest) {
+  if (currentBest === null) {
+    data.bestTimes[key] = value;
+    updated = true;
+  } else if (preferLower ? value < currentBest : value > currentBest) {
     data.bestTimes[key] = value;
     updated = true;
   }
@@ -300,6 +300,81 @@ function getSpeedText(avgSec) {
   if (avgSec < 2.0) return "速い";
   if (avgSec < 3.0) return "標準";
   return "伸びしろあり";
+}
+
+function getSurvivalRankInfo(score, difficulty) {
+  if (difficulty === "easy") {
+    if (score >= 20) {
+      return {
+        rank: "イージー王者",
+        comment: "安定感ばつぐん。完全に流れをつかんでる。"
+      };
+    }
+    if (score >= 12) {
+      return {
+        rank: "イージー達人",
+        comment: "かなりいい。落ち着いて解けてる。"
+      };
+    }
+    if (score >= 6) {
+      return {
+        rank: "イージー中級者",
+        comment: "いい調子。このまま二桁を狙える。"
+      };
+    }
+    return {
+      rank: "イージー見習い",
+      comment: "まずはここから。感覚をつかんでいこう。"
+    };
+  }
+
+  if (difficulty === "normal") {
+    if (score >= 18) {
+      return {
+        rank: "ノーマル王者",
+        comment: "強い。かなり仕上がってる。"
+      };
+    }
+    if (score >= 10) {
+      return {
+        rank: "ノーマル達人",
+        comment: "いい突破力。安定して伸ばせてる。"
+      };
+    }
+    if (score >= 5) {
+      return {
+        rank: "ノーマル中級者",
+        comment: "いい線いってる。次は二桁が目標。"
+      };
+    }
+    return {
+      rank: "ノーマル見習い",
+      comment: "ここからが本番。まずはリズムを作ろう。"
+    };
+  }
+
+  if (score >= 12) {
+    return {
+      rank: "ハード王者",
+      comment: "すごい。かなりの反応速度。"
+    };
+  }
+  if (score >= 6) {
+    return {
+      rank: "ハード達人",
+      comment: "強い。ハードでもしっかり戦えてる。"
+    };
+  }
+  if (score >= 3) {
+    return {
+      rank: "ハード中級者",
+      comment: "いい挑戦。かなりゲームになってきた。"
+    };
+  }
+  return {
+    rank: "ハード挑戦者",
+    comment: "ハードは別格。ここから少しずつ伸ばそう。"
+  };
 }
 
 function randInt(min, max) {
@@ -478,7 +553,7 @@ function updateModalInfo(mode, limit) {
     survivalHudEl?.classList.remove("hidden");
 
     const diff = survivalDifficultyConfig[currentSurvivalDifficulty];
-    const best = getBestTime(mode, diff.limit, currentSurvivalDifficulty);
+    const best = getBestRecord(mode, diff.limit, currentSurvivalDifficulty);
     if (modalBestTimeEl) modalBestTimeEl.textContent = best !== null ? `${best}問` : "未記録";
     if (modalLastRecordEl) modalLastRecordEl.textContent = formatLastRecord(mode, diff.limit, currentSurvivalDifficulty);
   } else {
@@ -486,7 +561,7 @@ function updateModalInfo(mode, limit) {
     survivalDifficultyBlockEl?.classList.add("hidden");
     survivalHudEl?.classList.add("hidden");
 
-    const best = getBestTime(mode, limit, "");
+    const best = getBestRecord(mode, limit, "");
     if (modalBestTimeEl) modalBestTimeEl.textContent = best ? formatTime(best) : "未記録";
     if (modalLastRecordEl) modalLastRecordEl.textContent = formatLastRecord(mode, limit, "");
   }
@@ -525,7 +600,6 @@ function openModeModal(mode) {
   updateModalInfo(currentMode, currentLimit);
   updateLimitButtons(currentLimit);
   showReadyView();
-
   modeModalEl?.classList.remove("hidden");
 }
 
@@ -748,12 +822,19 @@ function finalizeResult() {
 
   if (isSurvivalMode()) {
     const diff = survivalDifficultyConfig[currentSurvivalDifficulty];
-    bestUpdated = setBestTime(currentMode, diff.limit, currentSurvivalDifficulty, survivalScore);
+    const rankInfo = getSurvivalRankInfo(survivalScore, currentSurvivalDifficulty);
+
+    bestUpdated = setBestRecord(currentMode, diff.limit, currentSurvivalDifficulty, survivalScore, false);
 
     setLastResult(currentMode, diff.limit, currentSurvivalDifficulty, {
       score: survivalScore,
       totalMs
     });
+
+    if (survivalResultHeroEl) survivalResultHeroEl.classList.remove("hidden");
+    if (survivalResultRankEl) survivalResultRankEl.textContent = rankInfo.rank;
+    if (survivalResultScoreEl) survivalResultScoreEl.textContent = `${survivalScore}問突破`;
+    if (survivalResultCommentEl) survivalResultCommentEl.textContent = rankInfo.comment;
 
     if (resultCorrectCountEl) resultCorrectCountEl.textContent = `${survivalScore}問`;
     if (resultFinalTimeEl) resultFinalTimeEl.textContent = formatTime(totalMs);
@@ -771,14 +852,7 @@ function finalizeResult() {
     const avgSec = totalMs / 1000 / total;
 
     if (correctCount === total) {
-      const currentBest = getBestTime(currentMode, currentLimit, "");
-      if (currentBest === null || totalMs < currentBest) {
-        const key = makeRecordKey(currentMode, currentLimit, "");
-        const data = loadData();
-        data.bestTimes[key] = totalMs;
-        saveData(data);
-        bestUpdated = true;
-      }
+      bestUpdated = setBestRecord(currentMode, currentLimit, "", totalMs, true);
     }
 
     setLastResult(currentMode, currentLimit, "", {
@@ -787,6 +861,8 @@ function finalizeResult() {
       totalMs,
       avgSec
     });
+
+    if (survivalResultHeroEl) survivalResultHeroEl.classList.add("hidden");
 
     if (resultCorrectCountEl) resultCorrectCountEl.textContent = `${correctCount}/${total}`;
     if (resultFinalTimeEl) resultFinalTimeEl.textContent = formatTime(totalMs);
