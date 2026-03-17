@@ -85,12 +85,79 @@ let perQuestionStart = 0;
 let perQuestionFrameId = null;
 let perQuestionTimeoutId = null;
 
+let audioEnabled = true;
+let audioContext = null;
+
 function makeRecordKey(mode, limit) {
   return `${mode}__limit_${limit}`;
 }
 
 function getLimitLabel(limit) {
   return limit === 0 ? "制限なし" : `${limit}秒`;
+}
+
+function ensureAudioContext() {
+  if (!audioEnabled) return null;
+
+  if (!audioContext) {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
+    audioContext = new AudioCtx();
+  }
+
+  if (audioContext.state === "suspended") {
+    audioContext.resume();
+  }
+
+  return audioContext;
+}
+
+function playTone({ frequency, duration = 0.12, type = "sine", volume = 0.04, sweepTo = null }) {
+  const ctx = ensureAudioContext();
+  if (!ctx) return;
+
+  const oscillator = ctx.createOscillator();
+  const gainNode = ctx.createGain();
+
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+
+  if (sweepTo) {
+    oscillator.frequency.exponentialRampToValueAtTime(
+      sweepTo,
+      ctx.currentTime + duration
+    );
+  }
+
+  gainNode.gain.setValueAtTime(0.0001, ctx.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(volume, ctx.currentTime + 0.01);
+  gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+  oscillator.connect(gainNode);
+  gainNode.connect(ctx.destination);
+
+  oscillator.start(ctx.currentTime);
+  oscillator.stop(ctx.currentTime + duration);
+}
+
+function playCorrectSound() {
+  playTone({
+    frequency: 880,
+    duration: 0.09,
+    type: "sine",
+    volume: 0.035,
+    sweepTo: 1175
+  });
+}
+
+function playWrongSound() {
+  playTone({
+    frequency: 240,
+    duration: 0.16,
+    type: "triangle",
+    volume: 0.045,
+    sweepTo: 180
+  });
 }
 
 function loadData() {
@@ -377,7 +444,6 @@ function startPerQuestionLimit() {
   if (currentLimit <= 0) return;
 
   perQuestionStart = performance.now();
-
   const totalMs = currentLimit * 1000;
 
   function tick(now) {
@@ -507,6 +573,9 @@ function lockAndJudge(isCorrect) {
 
   if (isCorrect) {
     correctCount += 1;
+    playCorrectSound();
+  } else {
+    playWrongSound();
   }
 
   showJudge(isCorrect);
