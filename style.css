@@ -282,4 +282,321 @@ button {
   background: var(--accent);
   color: #ffffff;
   min-height: 52px;
-  padding
+  padding: 14px 18px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: var(--accent-weak);
+  color: var(--text);
+}
+
+.notice {
+  margin-top: 14px;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.notice:not(.subtle) {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.notice.subtle {
+  background: var(--info-bg);
+  color: var(--info-text);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.42);
+  z-index: 1000;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal.hidden {
+  display: none !important;
+}
+
+.modalPlayableCard {
+  width: 100%;
+  max-width: 560px;
+  margin: auto 0;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 22px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  max-height: none;
+  overflow: visible;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.compactModalHeader {
+  margin-bottom: 8px;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.modalGrid {
+  margin-top: 14px;
+}
+
+.playStickyHeader {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.playScrollArea {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-top: 12px;
+  padding-bottom: 8px;
+  min-height: 220px;
+  flex: 1 1 auto;
+}
+
+.playBlock {
+  margin-top: 0;
+}
+
+.playTitleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.playModeName {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.playModeMeta {
+  font-size: 13px;
+  color: var(--sub);
+  font-weight: 700;
+}
+
+.limitBlock {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--card-soft);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.limitOptions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.limitOption {
+  min-height: 44px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text);
+  border: 1px solid #dde3ea;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.limitOption.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+.limitMeterWrap {
+  margin-top: 6px;
+}
+
+.limitMeterLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--sub);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.limitMeterTrack {
+  width: 100%;
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.limitMeterBar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #ef4444, #f59e0b);
+  transform-origin: left center;
+  transition: transform 0.1s linear;
+}
+
+.iconButton {
+  appearance: none;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent-weak);
+  color: var(--text);
+  width: 42px;
+  height: 42px;
+  font-size: 24px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  min-height: 42px;
+}
+
+#modalReadyView,
+#modalResultView {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#modalPlayView {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.judgeOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.14);
+  z-index: 1100;
+  pointer-events: none;
+}
+
+.judgeOverlay.hidden {
+  display: none !important;
+}
+
+.judgeMark {
+  font-size: 96px;
+  line-height: 1;
+  font-weight: 800;
+  transform: scale(0.8);
+  animation: judgePop 0.38s ease;
+}
+
+.judgeOverlay.correct .judgeMark {
+  filter: drop-shadow(0 8px 18px rgba(6, 118, 71, 0.28));
+}
+
+.judgeOverlay.wrong .judgeMark {
+  filter: drop-shadow(0 8px 18px rgba(180, 35, 24, 0.28));
+}
+
+@keyframes judgePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 18px 14px 48px;
+  }
+
+  .titleLogo {
+    width: min(86vw, 360px);
+  }
+
+  .summaryGrid,
+  .resultGrid,
+  .limitOptions {
+    grid-template-columns: 1fr;
+  }
+
+  .buttonRow {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .value {
+    font-size: 24px;
+  }
+
+  .questionLabel {
+    font-size: 24px;
+  }
+
+  .answerInput {
+    font-size: 24px;
+  }
+
+  .modal {
+    padding: 10px;
+    align-items: flex-start;
+  }
+
+  .modalPlayableCard {
+    max-width: none;
+    margin: 0;
+    border-radius: 18px;
+    padding: 14px;
+  }
+
+  body::before {
+    background-size: min(100vw, 680px) auto;
+    opacity: 0.12;
+  }
+}
