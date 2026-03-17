@@ -343,4 +343,83 @@ button.secondary {
   position: fixed !important;
   inset: 0 !important;
   display: flex !important;
-  align
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(15, 23, 42, 0.14) !important;
+  z-index: 1100 !important;
+  pointer-events: none !important;
+}
+
+.judgeOverlay.hidden {
+  display: none !important;
+}
+
+.judgeMark {
+  font-size: 96px !important;
+  line-height: 1 !important;
+  font-weight: 800 !important;
+  transform: scale(0.8) !important;
+  animation: judgePop 0.38s ease !important;
+}
+
+.judgeOverlay.correct .judgeMark {
+  filter: drop-shadow(0 8px 18px rgba(6, 118, 71, 0.28));
+}
+
+.judgeOverlay.wrong .judgeMark {
+  filter: drop-shadow(0 8px 18px rgba(180, 35, 24, 0.28));
+}
+
+@keyframes judgePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 18px 14px 48px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+  }
+
+  .summaryGrid,
+  .resultGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .questionRow {
+    grid-template-columns: 1fr;
+  }
+
+  .questionLabel {
+    font-size: 24px;
+  }
+
+  .answerInput {
+    font-size: 22px;
+  }
+
+  .buttonRow {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .value {
+    font-size: 24px;
+  }
+}
