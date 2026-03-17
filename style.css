@@ -46,7 +46,7 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: url("mascot-bg.png");
+  background-image: url("mascot-bg.PNG");
   background-repeat: no-repeat;
   background-position: center bottom;
   background-size: min(92vw, 720px) auto;
