@@ -575,6 +575,49 @@ button.secondary {
   color: #b42318;
 }
 
+.survivalResultHero {
+  margin-top: 14px;
+  margin-bottom: 14px;
+  padding: 16px;
+  border-radius: 18px;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.96),
+    rgba(30, 41, 59, 0.94)
+  );
+  color: #ffffff;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.18);
+}
+
+.survivalResultRank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.survivalResultScore {
+  margin-top: 10px;
+  font-size: 32px;
+  line-height: 1.15;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.survivalResultComment {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 700;
+}
+
 .judgeOverlay {
   position: fixed;
   inset: 0;
@@ -704,5 +747,14 @@ button.secondary {
     width: 40px;
     min-width: 40px;
     height: 40px;
+  }
+
+  .survivalResultHero {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .survivalResultScore {
+    font-size: 28px;
   }
 }
