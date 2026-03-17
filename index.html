@@ -25,102 +25,84 @@
         <button class="modeSelectButton" data-mode="borrow" type="button">繰り下がり特化</button>
       </div>
     </section>
-
-    <section id="playScreen" class="hidden">
-      <section class="card summaryCard">
-        <div class="summaryGrid">
-          <div class="summaryItem">
-            <div class="label">モード</div>
-            <div id="modeName" class="value"></div>
-          </div>
-          <div class="summaryItem">
-            <div class="label">タイム</div>
-            <div id="timer" class="value">00:00</div>
-          </div>
-          <div class="summaryItem">
-            <div class="label">今日の回数</div>
-            <div id="todayCount" class="value">0回</div>
-          </div>
-          <div class="summaryItem">
-            <div class="label">ベスト</div>
-            <div id="bestTime" class="value smallValue">未記録</div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="cardHeader">
-          <h2>問題</h2>
-          <p id="modeDescription" class="subText"></p>
-        </div>
-
-        <div id="progressText" class="subText">1 / 10</div>
-
-        <form id="quizForm" class="quizForm"></form>
-
-        <div class="buttonRow">
-          <button id="backToHomeButton" type="button" class="secondary">ホームに戻る</button>
-        </div>
-      </section>
-
-      <section class="card resultCard">
-        <h2>結果</h2>
-        <div id="resultEmpty" class="resultEmpty">まだ結果はありません</div>
-
-        <div id="resultPanel" class="hidden">
-          <div class="resultGrid">
-            <div class="resultItem">
-              <div class="label">正解数</div>
-              <div id="correctCount" class="value"></div>
-            </div>
-            <div class="resultItem">
-              <div class="label">合計タイム</div>
-              <div id="finalTime" class="value"></div>
-            </div>
-            <div class="resultItem">
-              <div class="label">平均時間</div>
-              <div id="averageTime" class="value"></div>
-            </div>
-            <div class="resultItem">
-              <div class="label">前回比較</div>
-              <div id="comparisonText" class="value smallValue"></div>
-            </div>
-          </div>
-
-          <div id="bestUpdate" class="notice hidden"></div>
-          <div id="speedRating" class="notice subtle hidden"></div>
-
-          <div class="buttonRow">
-            <button id="retryButton" type="button">もう一度やる</button>
-            <button id="resultHomeButton" type="button" class="secondary">ホームに戻る</button>
-          </div>
-        </div>
-      </section>
-    </section>
   </main>
 
   <div id="modeModal" class="modal hidden">
-    <div class="modalCard">
+    <div class="modalCard modalPlayableCard">
       <div class="modalHeader">
         <h2 id="modalModeName">10問連続</h2>
         <button id="closeModalButton" type="button" class="iconButton" aria-label="閉じる">×</button>
       </div>
 
-      <p id="modalModeDescription" class="subText"></p>
+      <div id="modalReadyView">
+        <p id="modalModeDescription" class="subText"></p>
 
-      <div class="summaryGrid modalGrid">
-        <div class="summaryItem">
-          <div class="label">ベスト</div>
-          <div id="modalBestTime" class="value smallValue">未記録</div>
+        <div class="summaryGrid modalGrid">
+          <div class="summaryItem">
+            <div class="label">ベスト</div>
+            <div id="modalBestTime" class="value smallValue">未記録</div>
+          </div>
+          <div class="summaryItem">
+            <div class="label">前回記録</div>
+            <div id="modalLastRecord" class="value smallValue">未記録</div>
+          </div>
         </div>
-        <div class="summaryItem">
-          <div class="label">前回記録</div>
-          <div id="modalLastRecord" class="value smallValue">未記録</div>
+
+        <div class="buttonRow">
+          <button id="modalStartButton" type="button">スタート</button>
         </div>
       </div>
 
-      <div class="buttonRow">
-        <button id="modalStartButton" type="button">スタート</button>
+      <div id="modalPlayView" class="hidden">
+        <div class="summaryGrid compactGrid">
+          <div class="summaryItem compactItem">
+            <div class="label">タイム</div>
+            <div id="modalTimer" class="value">00:00</div>
+          </div>
+          <div class="summaryItem compactItem">
+            <div class="label">進行</div>
+            <div id="modalProgress" class="value">1 / 10</div>
+          </div>
+        </div>
+
+        <div class="playBlock">
+          <p id="modalPlayDescription" class="subText"></p>
+          <form id="modalQuizForm" class="quizForm"></form>
+        </div>
+      </div>
+
+      <div id="modalResultView" class="hidden">
+        <div class="cardHeader">
+          <h2>結果</h2>
+          <p class="subText">今回の記録です</p>
+        </div>
+
+        <div class="resultGrid">
+          <div class="resultItem">
+            <div class="label">正解数</div>
+            <div id="resultCorrectCount" class="value"></div>
+          </div>
+          <div class="resultItem">
+            <div class="label">合計タイム</div>
+            <div id="resultFinalTime" class="value"></div>
+          </div>
+          <div class="resultItem">
+            <div class="label">平均時間</div>
+            <div id="resultAverageTime" class="value"></div>
+          </div>
+          <div class="resultItem">
+            <div class="label">前回比較</div>
+            <div id="resultComparisonText" class="value smallValue"></div>
+          </div>
+        </div>
+
+        <div id="resultBestUpdate" class="notice hidden"></div>
+        <div id="resultSpeedRating" class="notice subtle hidden"></div>
+
+        <div class="buttonRow">
+          <button id="modalRetryButton" type="button">もう一度やる</button>
+          <button id="modalCloseAfterResultButton" type="button" class="secondary">閉じる</button>
+        </div>
       </div>
     </div>
   </div>
