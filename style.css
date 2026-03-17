@@ -363,6 +363,43 @@ button.secondary {
   border-color: var(--accent);
 }
 
+.difficultyOptions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.difficultyOption {
+  min-height: 58px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text);
+  border: 1px solid #dde3ea;
+  width: 100%;
+  text-align: left;
+}
+
+.difficultyOption.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+.difficultyName {
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.difficultyMeta {
+  display: block;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
 #modalReadyView,
 #modalPlayView,
 #modalResultView {
@@ -411,6 +448,33 @@ button.secondary {
   font-size: 13px;
   color: var(--sub);
   font-weight: 700;
+}
+
+.survivalHud {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.survivalHudItem {
+  background: var(--card-soft);
+  border-radius: 14px;
+  padding: 10px 12px;
+}
+
+.survivalHudLabel {
+  display: block;
+  font-size: 12px;
+  color: var(--sub);
+  margin-bottom: 4px;
+}
+
+.survivalHudValue {
+  display: block;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
 }
 
 .limitMeterWrap {
@@ -589,7 +653,8 @@ button.secondary {
   }
 
   .summaryGrid,
-  .resultGrid {
+  .resultGrid,
+  .survivalHud {
     grid-template-columns: 1fr;
   }
 
