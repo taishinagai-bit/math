@@ -15,11 +15,9 @@
 
     <section class="card">
       <div class="modeTabs">
-        <button class="modeTab active" data-mode="daily" type="button">今日のドリル</button>
-        <button class="modeTab" data-mode="ten" type="button">10問連続</button>
+        <button class="modeTab active" data-mode="ten" type="button">10問連続</button>
         <button class="modeTab" data-mode="carry" type="button">繰り上がり特化</button>
         <button class="modeTab" data-mode="borrow" type="button">繰り下がり特化</button>
-        <button class="modeTab" data-mode="speed" type="button">高速モード</button>
       </div>
     </section>
 
@@ -50,18 +48,17 @@
         <p id="modeDescription" class="subText"></p>
       </div>
 
-      <div id="progressText" class="subText"></div>
+      <div id="progressText" class="subText">10問</div>
 
-      <form id="quizForm" class="quizForm"></form>
-
-      <div class="buttonRow" id="normalButtons">
-        <button id="checkButton" type="button">答え合わせ</button>
-        <button id="retryButton" type="button" class="secondary">同じモードでもう一度</button>
+      <div id="readyArea" class="readyArea">
+        <p class="readyText">準備ができたらスタート</p>
+        <button id="startButton" type="button">スタート</button>
       </div>
 
-      <div class="buttonRow hidden" id="speedButtons">
-        <button id="speedNextButton" type="button">回答して次へ</button>
-        <button id="speedRetryButton" type="button" class="secondary">最初からやり直す</button>
+      <form id="quizForm" class="quizForm hidden"></form>
+
+      <div class="buttonRow">
+        <button id="retryButton" type="button" class="secondary">最初からやり直す</button>
       </div>
     </section>
 
@@ -99,6 +96,10 @@
       <div id="lastRecordText" class="historyText">未記録</div>
     </section>
   </main>
+
+  <div id="judgeOverlay" class="judgeOverlay hidden">
+    <div id="judgeMark" class="judgeMark">⭕️</div>
+  </div>
 
   <script src="script.js"></script>
 </body>
