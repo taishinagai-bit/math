@@ -7,23 +7,23 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="heroHeader">
-    <div class="heroInner">
-      <p id="dateText" class="dateText"></p>
-    </div>
-  </header>
-
   <main class="container">
-    <section id="homeScreen" class="card homeCard">
-      <div class="cardHeader">
-        <h2>モード選択</h2>
-        <p class="subText">練習したいモードを選んでください</p>
+    <section id="homeScreen" class="homePanel">
+      <div class="modePicker">
+        <button id="prevModeButton" class="navButton" type="button" aria-label="前のモード">‹</button>
+
+        <div class="modeCenter">
+          <div id="currentModeName" class="currentModeName">10問連続</div>
+          <p id="currentModeDescription" class="currentModeDescription">
+            足し算・引き算をテンポよく10問
+          </p>
+        </div>
+
+        <button id="nextModeButton" class="navButton" type="button" aria-label="次のモード">›</button>
       </div>
 
-      <div class="modeTabs singleColumn">
-        <button class="modeSelectButton" data-mode="ten" type="button">10問連続</button>
-        <button class="modeSelectButton" data-mode="carry" type="button">繰り上がり特化</button>
-        <button class="modeSelectButton" data-mode="borrow" type="button">繰り下がり特化</button>
+      <div class="homeActions">
+        <button id="openSelectedModeButton" class="startPrimaryButton" type="button">このモードで始める</button>
       </div>
     </section>
   </main>
