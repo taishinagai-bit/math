@@ -1,6 +1,7 @@
-const STORAGE_KEY = "math-training-modal-c-layout-v1";
+const STORAGE_KEY = "math-training-modal-c-layout-v2";
 
-const modeOrder = ["ten", "carry", "borrow"];
+const modeOrder = ["ten", "carry", "borrow", "survival"];
+const survivalDifficultyOrder = ["easy", "normal", "hard"];
 
 const modeConfig = {
   ten: {
@@ -17,6 +18,29 @@ const modeConfig = {
     name: "繰り下がり特化",
     description: "引き算の繰り下がりだけを集中練習",
     count: 10
+  },
+  survival: {
+    name: "サバイバル",
+    description: "ライフが0になるまで続くサバイバルモード",
+    count: Infinity
+  }
+};
+
+const survivalDifficultyConfig = {
+  easy: {
+    name: "イージー",
+    lives: 3,
+    limit: 5
+  },
+  normal: {
+    name: "ノーマル",
+    lives: 2,
+    limit: 4
+  },
+  hard: {
+    name: "ハード",
+    lives: 1,
+    limit: 3
   }
 };
 
@@ -27,6 +51,10 @@ const nextModeButtonEl = document.getElementById("nextModeButton");
 const openSelectedModeButtonEl = document.getElementById("openSelectedModeButton");
 
 const limitOptionButtons = Array.from(document.querySelectorAll(".limitOption"));
+const difficultyOptionButtons = Array.from(document.querySelectorAll(".difficultyOption"));
+
+const normalLimitBlockEl = document.getElementById("normalLimitBlock");
+const survivalDifficultyBlockEl = document.getElementById("survivalDifficultyBlock");
 
 const modeModalEl = document.getElementById("modeModal");
 const closeModalButtonEl = document.getElementById("closeModalButton");
@@ -56,6 +84,10 @@ const limitMeterWrapEl = document.getElementById("limitMeterWrap");
 const limitMeterTextEl = document.getElementById("limitMeterText");
 const limitMeterBarEl = document.getElementById("limitMeterBar");
 
+const survivalHudEl = document.getElementById("survivalHud");
+const survivalLivesEl = document.getElementById("survivalLives");
+const survivalScoreEl = document.getElementById("survivalScore");
+
 const resultCorrectCountEl = document.getElementById("resultCorrectCount");
 const resultFinalTimeEl = document.getElementById("resultFinalTime");
 const resultAverageTimeEl = document.getElementById("resultAverageTime");
@@ -68,6 +100,8 @@ const judgeMarkEl = document.getElementById("judgeMark");
 
 let currentMode = "ten";
 let currentLimit = 0;
+let currentSurvivalDifficulty = "easy";
+
 let questions = [];
 let currentQuestionIndex = 0;
 let correctCount = 0;
@@ -75,6 +109,9 @@ let startTime = 0;
 let timerId = null;
 let started = false;
 let isLocked = false;
+
+let survivalLives = 0;
+let survivalScore = 0;
 
 let perQuestionStart = 0;
 let perQuestionFrameId = null;
@@ -163,12 +200,24 @@ function bindInitialAudioUnlock() {
   document.addEventListener("click", unlockOnce, { once: true });
 }
 
-function makeRecordKey(mode, limit) {
-  return `${mode}__limit_${limit}`;
+function makeRecordKey(mode, limit, difficulty = "") {
+  return `${mode}__limit_${limit}__difficulty_${difficulty}`;
+}
+
+function isSurvivalMode(mode = currentMode) {
+  return mode === "survival";
 }
 
 function getLimitLabel(limit) {
   return limit === 0 ? "制限なし" : `${limit}秒`;
+}
+
+function getCurrentPlayMeta() {
+  if (isSurvivalMode()) {
+    const diff = survivalDifficultyConfig[currentSurvivalDifficulty];
+    return `${diff.name} / ${diff.lives}ライフ / ${diff.limit}秒`;
+  }
+  return getLimitLabel(currentLimit);
 }
 
 function loadData() {
@@ -187,20 +236,27 @@ function saveData(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
-function getBestTime(mode, limit) {
-  const key = makeRecordKey(mode, limit);
+function getRecordKeyForCurrentMode() {
+  if (isSurvivalMode()) {
+    return makeRecordKey(currentMode, survivalDifficultyConfig[currentSurvivalDifficulty].limit, currentSurvivalDifficulty);
+  }
+  return makeRecordKey(currentMode, currentLimit, "");
+}
+
+function getBestTime(mode, limit, difficulty = "") {
+  const key = makeRecordKey(mode, limit, difficulty);
   const data = loadData();
   return data.bestTimes?.[key] || null;
 }
 
-function setBestTime(mode, limit, ms) {
-  const key = makeRecordKey(mode, limit);
+function setBestTime(mode, limit, difficulty, value) {
+  const key = makeRecordKey(mode, limit, difficulty);
   const data = loadData();
   const currentBest = data.bestTimes?.[key] || null;
   let updated = false;
 
-  if (currentBest === null || ms < currentBest) {
-    data.bestTimes[key] = ms;
+  if (currentBest === null || value > currentBest) {
+    data.bestTimes[key] = value;
     updated = true;
   }
 
@@ -208,14 +264,14 @@ function setBestTime(mode, limit, ms) {
   return updated;
 }
 
-function getLastResult(mode, limit) {
-  const key = makeRecordKey(mode, limit);
+function getLastResult(mode, limit, difficulty = "") {
+  const key = makeRecordKey(mode, limit, difficulty);
   const data = loadData();
   return data.lastResults?.[key] || null;
 }
 
-function setLastResult(mode, limit, result) {
-  const key = makeRecordKey(mode, limit);
+function setLastResult(mode, limit, difficulty, result) {
+  const key = makeRecordKey(mode, limit, difficulty);
   const data = loadData();
   data.lastResults[key] = result;
   saveData(data);
@@ -228,9 +284,14 @@ function formatTime(ms) {
   return `${minutes}:${seconds}`;
 }
 
-function formatLastRecord(mode, limit) {
-  const last = getLastResult(mode, limit);
+function formatLastRecord(mode, limit, difficulty = "") {
+  const last = getLastResult(mode, limit, difficulty);
   if (!last) return "未記録";
+
+  if (mode === "survival") {
+    return `${last.score}問 ・ ${formatTime(last.totalMs)}`;
+  }
+
   return `${last.correct}/${last.total}問 ・ ${formatTime(last.totalMs)} ・ ${last.avgSec.toFixed(1)}秒/問`;
 }
 
@@ -245,36 +306,106 @@ function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function makeAdd() {
-  const a = randInt(11, 79);
-  const b = randInt(11, 29);
+function makeAddRange(minA, maxA, minB, maxB) {
+  const a = randInt(minA, maxA);
+  const b = randInt(minB, maxB);
   return { text: `${a} + ${b}`, answer: a + b };
 }
 
-function makeSub() {
-  const a = randInt(40, 99);
-  const b = randInt(11, 39);
-  const top = Math.max(a, b + 10);
-  const bottom = Math.min(b, top - 10);
-  return { text: `${top} - ${bottom}`, answer: top - bottom };
+function makeSubRange(minA, maxA, minB, maxB) {
+  const a = randInt(minA, maxA);
+  const b = randInt(minB, Math.min(maxB, a - 1));
+  return { text: `${a} - ${b}`, answer: a - b };
 }
 
-function makeCarry() {
+function makeCarryRange(minA, maxA, minB, maxB) {
   let a, b;
   do {
-    a = randInt(15, 79);
-    b = randInt(15, 79);
+    a = randInt(minA, maxA);
+    b = randInt(minB, maxB);
   } while ((a % 10) + (b % 10) < 10);
   return { text: `${a} + ${b}`, answer: a + b };
 }
 
-function makeBorrow() {
+function makeBorrowRange(minA, maxA, minB, maxB) {
   let a, b;
   do {
-    a = randInt(30, 99);
-    b = randInt(11, a - 1);
+    a = randInt(minA, maxA);
+    b = randInt(minB, Math.min(maxB, a - 1));
   } while ((a % 10) >= (b % 10));
   return { text: `${a} - ${b}`, answer: a - b };
+}
+
+function makeAdd() {
+  return makeAddRange(11, 79, 11, 29);
+}
+
+function makeSub() {
+  return makeSubRange(40, 99, 11, 39);
+}
+
+function makeCarry() {
+  return makeCarryRange(15, 79, 15, 79);
+}
+
+function makeBorrow() {
+  return makeBorrowRange(30, 99, 11, 79);
+}
+
+function getSurvivalStage(score) {
+  if (score <= 4) return 1;
+  if (score <= 9) return 2;
+  return 3;
+}
+
+function createSurvivalQuestion(difficulty, score) {
+  const stage = getSurvivalStage(score);
+
+  if (difficulty === "easy") {
+    if (stage === 1) {
+      return Math.random() < 0.6
+        ? makeAddRange(1, 9, 1, 9)
+        : makeSubRange(5, 18, 1, 9);
+    }
+    if (stage === 2) {
+      return Math.random() < 0.5
+        ? makeAddRange(5, 19, 2, 12)
+        : makeSubRange(10, 25, 2, 12);
+    }
+    return Math.random() < 0.5
+      ? makeCarryRange(8, 29, 5, 19)
+      : makeBorrowRange(20, 39, 5, 19);
+  }
+
+  if (difficulty === "normal") {
+    if (stage === 1) {
+      return Math.random() < 0.5
+        ? makeAddRange(8, 25, 3, 15)
+        : makeSubRange(12, 30, 3, 15);
+    }
+    if (stage === 2) {
+      return Math.random() < 0.5
+        ? makeCarryRange(12, 39, 8, 29)
+        : makeBorrowRange(20, 49, 8, 29);
+    }
+    return Math.random() < 0.5
+      ? makeCarryRange(20, 59, 12, 39)
+      : makeBorrowRange(35, 79, 12, 39);
+  }
+
+  if (stage === 1) {
+    return Math.random() < 0.5
+      ? makeCarryRange(15, 49, 10, 35)
+      : makeBorrowRange(25, 59, 10, 35);
+  }
+  if (stage === 2) {
+    return Math.random() < 0.5
+      ? makeCarryRange(30, 69, 15, 45)
+      : makeBorrowRange(45, 89, 15, 45);
+  }
+  return Math.random() < 0.5
+    ? makeCarryRange(45, 99, 25, 59)
+    : makeBorrowRange(60, 99, 25, 59);
 }
 
 function createQuestion(mode) {
@@ -305,6 +436,21 @@ function updateHomeModeDisplay() {
   if (currentModeDescriptionEl) currentModeDescriptionEl.textContent = modeConfig[currentMode].description;
 }
 
+function updateDifficultyButtons() {
+  difficultyOptionButtons.forEach((button) => {
+    button.classList.toggle("active", button.dataset.difficulty === currentSurvivalDifficulty);
+  });
+}
+
+function updateSurvivalHud() {
+  if (survivalLivesEl) {
+    survivalLivesEl.textContent = "❤️".repeat(Math.max(0, survivalLives));
+  }
+  if (survivalScoreEl) {
+    survivalScoreEl.textContent = String(survivalScore);
+  }
+}
+
 function goPrevMode() {
   const index = modeOrder.indexOf(currentMode);
   const nextIndex = (index - 1 + modeOrder.length) % modeOrder.length;
@@ -324,11 +470,26 @@ function updateModalInfo(mode, limit) {
   if (modalModeDescriptionEl) modalModeDescriptionEl.textContent = modeConfig[mode].description;
   if (modalPlayDescriptionEl) modalPlayDescriptionEl.textContent = modeConfig[mode].description;
   if (playModeNameEl) playModeNameEl.textContent = modeConfig[mode].name;
-  if (playModeMetaEl) playModeMetaEl.textContent = getLimitLabel(limit);
+  if (playModeMetaEl) playModeMetaEl.textContent = getCurrentPlayMeta();
 
-  const best = getBestTime(mode, limit);
-  if (modalBestTimeEl) modalBestTimeEl.textContent = best ? formatTime(best) : "未記録";
-  if (modalLastRecordEl) modalLastRecordEl.textContent = formatLastRecord(mode, limit);
+  if (isSurvivalMode(mode)) {
+    normalLimitBlockEl?.classList.add("hidden");
+    survivalDifficultyBlockEl?.classList.remove("hidden");
+    survivalHudEl?.classList.remove("hidden");
+
+    const diff = survivalDifficultyConfig[currentSurvivalDifficulty];
+    const best = getBestTime(mode, diff.limit, currentSurvivalDifficulty);
+    if (modalBestTimeEl) modalBestTimeEl.textContent = best !== null ? `${best}問` : "未記録";
+    if (modalLastRecordEl) modalLastRecordEl.textContent = formatLastRecord(mode, diff.limit, currentSurvivalDifficulty);
+  } else {
+    normalLimitBlockEl?.classList.remove("hidden");
+    survivalDifficultyBlockEl?.classList.add("hidden");
+    survivalHudEl?.classList.add("hidden");
+
+    const best = getBestTime(mode, limit, "");
+    if (modalBestTimeEl) modalBestTimeEl.textContent = best ? formatTime(best) : "未記録";
+    if (modalLastRecordEl) modalLastRecordEl.textContent = formatLastRecord(mode, limit, "");
+  }
 }
 
 function updateLimitButtons(limit) {
@@ -338,21 +499,21 @@ function updateLimitButtons(limit) {
 }
 
 function showReadyView() {
-  if (modalReadyViewEl) modalReadyViewEl.classList.remove("hidden");
-  if (modalPlayViewEl) modalPlayViewEl.classList.add("hidden");
-  if (modalResultViewEl) modalResultViewEl.classList.add("hidden");
+  modalReadyViewEl?.classList.remove("hidden");
+  modalPlayViewEl?.classList.add("hidden");
+  modalResultViewEl?.classList.add("hidden");
 }
 
 function showPlayView() {
-  if (modalReadyViewEl) modalReadyViewEl.classList.add("hidden");
-  if (modalPlayViewEl) modalPlayViewEl.classList.remove("hidden");
-  if (modalResultViewEl) modalResultViewEl.classList.add("hidden");
+  modalReadyViewEl?.classList.add("hidden");
+  modalPlayViewEl?.classList.remove("hidden");
+  modalResultViewEl?.classList.add("hidden");
 }
 
 function showResultView() {
-  if (modalReadyViewEl) modalReadyViewEl.classList.add("hidden");
-  if (modalPlayViewEl) modalPlayViewEl.classList.add("hidden");
-  if (modalResultViewEl) modalResultViewEl.classList.remove("hidden");
+  modalReadyViewEl?.classList.add("hidden");
+  modalPlayViewEl?.classList.add("hidden");
+  modalResultViewEl?.classList.remove("hidden");
 }
 
 function openModeModal(mode) {
@@ -360,13 +521,12 @@ function openModeModal(mode) {
   playMenuBgm();
   currentMode = mode;
   updateHomeModeDisplay();
+  updateDifficultyButtons();
   updateModalInfo(currentMode, currentLimit);
   updateLimitButtons(currentLimit);
   showReadyView();
 
-  if (modeModalEl) {
-    modeModalEl.classList.remove("hidden");
-  }
+  modeModalEl?.classList.remove("hidden");
 }
 
 function closeModeModal() {
@@ -374,27 +534,38 @@ function closeModeModal() {
   stopPerQuestionLimit();
   started = false;
   playMenuBgm();
-
-  if (modeModalEl) {
-    modeModalEl.classList.add("hidden");
-  }
+  modeModalEl?.classList.add("hidden");
 }
 
 function updateProgress() {
   if (!modalProgressEl) return;
-  modalProgressEl.textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
+
+  if (isSurvivalMode()) {
+    modalProgressEl.textContent = `${survivalScore}問`;
+  } else {
+    modalProgressEl.textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
+  }
 }
 
 function renderCurrentQuestion() {
   if (!modalQuizFormEl) return;
 
-  const q = questions[currentQuestionIndex];
+  let q;
+
+  if (isSurvivalMode()) {
+    q = createSurvivalQuestion(currentSurvivalDifficulty, survivalScore);
+    questions = [q];
+    currentQuestionIndex = 0;
+  } else {
+    q = questions[currentQuestionIndex];
+  }
+
   if (!q) return;
 
   modalQuizFormEl.innerHTML = `
     <div class="questionRow">
       <label class="questionLabel" for="answerInput">
-        <span class="questionNumber">問${currentQuestionIndex + 1}</span>
+        <span class="questionNumber">${isSurvivalMode() ? `サバイバル ${survivalScore + 1}問目` : `問${currentQuestionIndex + 1}`}</span>
         <span>${q.text} = </span>
       </label>
       <input
@@ -416,6 +587,7 @@ function renderCurrentQuestion() {
   }
 
   updateProgress();
+  updateSurvivalHud();
   startPerQuestionLimit();
 }
 
@@ -450,13 +622,22 @@ function stopPerQuestionLimit() {
   }
 }
 
+function getCurrentQuestionLimit() {
+  if (isSurvivalMode()) {
+    return survivalDifficultyConfig[currentSurvivalDifficulty].limit;
+  }
+  return currentLimit;
+}
+
 function updateLimitMeterVisibility() {
-  const show = currentLimit > 0;
+  const currentQuestionLimit = getCurrentQuestionLimit();
+  const show = currentQuestionLimit > 0;
+
   if (limitMeterWrapEl) {
     limitMeterWrapEl.classList.toggle("hidden", !show);
   }
   if (limitMeterTextEl) {
-    limitMeterTextEl.textContent = show ? `${currentLimit.toFixed(1)}秒` : "";
+    limitMeterTextEl.textContent = show ? `${currentQuestionLimit.toFixed(1)}秒` : "";
   }
   if (limitMeterBarEl) {
     limitMeterBarEl.style.transform = "scaleX(1)";
@@ -467,10 +648,11 @@ function startPerQuestionLimit() {
   stopPerQuestionLimit();
   updateLimitMeterVisibility();
 
-  if (currentLimit <= 0) return;
+  const currentQuestionLimit = getCurrentQuestionLimit();
+  if (currentQuestionLimit <= 0) return;
 
   perQuestionStart = performance.now();
-  const totalMs = currentLimit * 1000;
+  const totalMs = currentQuestionLimit * 1000;
 
   function tick(now) {
     const elapsed = now - perQuestionStart;
@@ -498,8 +680,18 @@ function startPerQuestionLimit() {
 
 function startSession() {
   unlockAudio();
-  generateQuestions();
   started = true;
+  isLocked = false;
+  correctCount = 0;
+
+  if (isSurvivalMode()) {
+    const diff = survivalDifficultyConfig[currentSurvivalDifficulty];
+    survivalLives = diff.lives;
+    survivalScore = 0;
+  } else {
+    generateQuestions();
+  }
+
   playPlayBgm();
   showPlayView();
   updateModalInfo(currentMode, currentLimit);
@@ -517,13 +709,23 @@ function showJudge(isCorrect) {
 }
 
 function hideJudge() {
-  if (!judgeOverlayEl) return;
-  judgeOverlayEl.classList.add("hidden");
-  judgeOverlayEl.classList.remove("correct", "wrong");
+  judgeOverlayEl?.classList.add("hidden");
+  judgeOverlayEl?.classList.remove("correct", "wrong");
 }
 
-function makeComparisonText(mode, limit, totalMs) {
-  const last = getLastResult(mode, limit);
+function makeComparisonText(mode, totalMs) {
+  if (isSurvivalMode(mode)) {
+    const diff = survivalDifficultyConfig[currentSurvivalDifficulty];
+    const last = getLastResult(mode, diff.limit, currentSurvivalDifficulty);
+    if (!last) return "初回記録";
+
+    const diffScore = survivalScore - last.score;
+    if (diffScore > 0) return `前回より +${diffScore}問`;
+    if (diffScore < 0) return `前回より ${Math.abs(diffScore)}問少ない`;
+    return "前回と同じ記録";
+  }
+
+  const last = getLastResult(mode, currentLimit, "");
   if (!last) return "初回記録";
 
   const diffMs = totalMs - last.totalMs;
@@ -540,28 +742,61 @@ function finalizeResult() {
   stopPerQuestionLimit();
 
   const totalMs = Date.now() - startTime;
-  const total = questions.length;
-  const avgSec = totalMs / 1000 / total;
-
-  const isPerfect = correctCount === total;
-  const comparisonMessage = makeComparisonText(currentMode, currentLimit, totalMs);
+  const comparisonMessage = makeComparisonText(currentMode, totalMs);
 
   let bestUpdated = false;
-  if (isPerfect) {
-    bestUpdated = setBestTime(currentMode, currentLimit, totalMs);
+
+  if (isSurvivalMode()) {
+    const diff = survivalDifficultyConfig[currentSurvivalDifficulty];
+    bestUpdated = setBestTime(currentMode, diff.limit, currentSurvivalDifficulty, survivalScore);
+
+    setLastResult(currentMode, diff.limit, currentSurvivalDifficulty, {
+      score: survivalScore,
+      totalMs
+    });
+
+    if (resultCorrectCountEl) resultCorrectCountEl.textContent = `${survivalScore}問`;
+    if (resultFinalTimeEl) resultFinalTimeEl.textContent = formatTime(totalMs);
+    if (resultAverageTimeEl) {
+      const avgSec = survivalScore > 0 ? totalMs / 1000 / survivalScore : totalMs / 1000;
+      resultAverageTimeEl.textContent = `${avgSec.toFixed(1)}秒/問`;
+    }
+    if (resultComparisonTextEl) resultComparisonTextEl.textContent = comparisonMessage;
+    if (resultSpeedRatingEl) {
+      resultSpeedRatingEl.textContent = `難易度: ${survivalDifficultyConfig[currentSurvivalDifficulty].name}`;
+      resultSpeedRatingEl.classList.remove("hidden");
+    }
+  } else {
+    const total = questions.length;
+    const avgSec = totalMs / 1000 / total;
+
+    if (correctCount === total) {
+      const currentBest = getBestTime(currentMode, currentLimit, "");
+      if (currentBest === null || totalMs < currentBest) {
+        const key = makeRecordKey(currentMode, currentLimit, "");
+        const data = loadData();
+        data.bestTimes[key] = totalMs;
+        saveData(data);
+        bestUpdated = true;
+      }
+    }
+
+    setLastResult(currentMode, currentLimit, "", {
+      correct: correctCount,
+      total,
+      totalMs,
+      avgSec
+    });
+
+    if (resultCorrectCountEl) resultCorrectCountEl.textContent = `${correctCount}/${total}`;
+    if (resultFinalTimeEl) resultFinalTimeEl.textContent = formatTime(totalMs);
+    if (resultAverageTimeEl) resultAverageTimeEl.textContent = `${avgSec.toFixed(1)}秒/問`;
+    if (resultComparisonTextEl) resultComparisonTextEl.textContent = comparisonMessage;
+    if (resultSpeedRatingEl) {
+      resultSpeedRatingEl.textContent = `速度評価: ${getSpeedText(avgSec)}`;
+      resultSpeedRatingEl.classList.remove("hidden");
+    }
   }
-
-  setLastResult(currentMode, currentLimit, {
-    correct: correctCount,
-    total,
-    totalMs,
-    avgSec
-  });
-
-  if (resultCorrectCountEl) resultCorrectCountEl.textContent = `${correctCount}/${total}`;
-  if (resultFinalTimeEl) resultFinalTimeEl.textContent = formatTime(totalMs);
-  if (resultAverageTimeEl) resultAverageTimeEl.textContent = `${avgSec.toFixed(1)}秒/問`;
-  if (resultComparisonTextEl) resultComparisonTextEl.textContent = comparisonMessage;
 
   if (resultBestUpdateEl) {
     if (bestUpdated) {
@@ -572,16 +807,17 @@ function finalizeResult() {
     }
   }
 
-  if (resultSpeedRatingEl) {
-    resultSpeedRatingEl.textContent = `速度評価: ${getSpeedText(avgSec)}`;
-    resultSpeedRatingEl.classList.remove("hidden");
-  }
-
   updateModalInfo(currentMode, currentLimit);
   showResultView();
 }
 
 function goNextQuestion() {
+  if (isSurvivalMode()) {
+    renderCurrentQuestion();
+    isLocked = false;
+    return;
+  }
+
   currentQuestionIndex += 1;
 
   if (currentQuestionIndex >= questions.length) {
@@ -593,9 +829,47 @@ function goNextQuestion() {
   isLocked = false;
 }
 
+function applySurvivalDamage() {
+  survivalLives -= 1;
+  updateSurvivalHud();
+
+  if (survivalLives <= 0) {
+    finalizeResult();
+    return false;
+  }
+
+  return true;
+}
+
 function lockAndJudge(isCorrect) {
   isLocked = true;
   stopPerQuestionLimit();
+
+  if (isSurvivalMode()) {
+    if (isCorrect) {
+      survivalScore += 1;
+      playCorrectSound();
+      showJudge(true);
+
+      setTimeout(() => {
+        hideJudge();
+        goNextQuestion();
+      }, 420);
+      return;
+    }
+
+    playWrongSound();
+    showJudge(false);
+
+    setTimeout(() => {
+      hideJudge();
+      const canContinue = applySurvivalDamage();
+      if (canContinue) {
+        goNextQuestion();
+      }
+    }, 420);
+    return;
+  }
 
   if (isCorrect) {
     correctCount += 1;
@@ -621,7 +895,7 @@ function handleAutoSubmit(event) {
   if (!started || isLocked) return;
 
   const input = event.target;
-  const q = questions[currentQuestionIndex];
+  const q = questions[currentQuestionIndex] || questions[0];
   const requiredDigits = getAnswerDigits(q.answer);
   const currentValue = input.value.replace("-", "");
 
@@ -632,19 +906,12 @@ function handleAutoSubmit(event) {
   lockAndJudge(isCorrect);
 }
 
-if (prevModeButtonEl) {
-  prevModeButtonEl.addEventListener("click", goPrevMode);
-}
+prevModeButtonEl?.addEventListener("click", goPrevMode);
+nextModeButtonEl?.addEventListener("click", goNextMode);
 
-if (nextModeButtonEl) {
-  nextModeButtonEl.addEventListener("click", goNextMode);
-}
-
-if (openSelectedModeButtonEl) {
-  openSelectedModeButtonEl.addEventListener("click", () => {
-    openModeModal(currentMode);
-  });
-}
+openSelectedModeButtonEl?.addEventListener("click", () => {
+  openModeModal(currentMode);
+});
 
 limitOptionButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -654,37 +921,27 @@ limitOptionButtons.forEach((button) => {
   });
 });
 
-if (closeModalButtonEl) {
-  closeModalButtonEl.addEventListener("click", closeModeModal);
-}
-
-if (closePlayModalButtonEl) {
-  closePlayModalButtonEl.addEventListener("click", closeModeModal);
-}
-
-if (modalStartButtonEl) {
-  modalStartButtonEl.addEventListener("click", startSession);
-}
-
-if (modalRetryButtonEl) {
-  modalRetryButtonEl.addEventListener("click", startSession);
-}
-
-if (modalCloseAfterResultButtonEl) {
-  modalCloseAfterResultButtonEl.addEventListener("click", closeModeModal);
-}
-
-if (modalCloseAfterResultButtonTopEl) {
-  modalCloseAfterResultButtonTopEl.addEventListener("click", closeModeModal);
-}
-
-if (modeModalEl) {
-  modeModalEl.addEventListener("click", (event) => {
-    if (event.target === modeModalEl) {
-      closeModeModal();
-    }
+difficultyOptionButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    currentSurvivalDifficulty = button.dataset.difficulty;
+    updateDifficultyButtons();
+    updateModalInfo(currentMode, currentLimit);
   });
-}
+});
+
+closeModalButtonEl?.addEventListener("click", closeModeModal);
+closePlayModalButtonEl?.addEventListener("click", closeModeModal);
+modalStartButtonEl?.addEventListener("click", startSession);
+modalRetryButtonEl?.addEventListener("click", startSession);
+modalCloseAfterResultButtonEl?.addEventListener("click", closeModeModal);
+modalCloseAfterResultButtonTopEl?.addEventListener("click", closeModeModal);
+
+modeModalEl?.addEventListener("click", (event) => {
+  if (event.target === modeModalEl) {
+    closeModeModal();
+  }
+});
 
 updateHomeModeDisplay();
+updateDifficultyButtons();
 bindInitialAudioUnlock();
