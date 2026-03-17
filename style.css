@@ -4,8 +4,8 @@
 
 :root {
   --bg: #f3f5f9;
-  --card: rgba(255, 255, 255, 0.88);
-  --card-soft: rgba(248, 250, 252, 0.82);
+  --card: rgba(255, 255, 255, 0.82);
+  --card-soft: rgba(248, 250, 252, 0.78);
   --text: #172033;
   --sub: #6b7280;
   --accent: #0f172a;
@@ -48,9 +48,9 @@ body::before {
   inset: 0;
   background-image: url("mascot-bg.PNG");
   background-repeat: no-repeat;
-  background-position: center bottom;
-  background-size: min(92vw, 720px) auto;
-  opacity: 0.12;
+  background-position: center 120px;
+  background-size: min(94vw, 760px) auto;
+  opacity: 0.22;
   pointer-events: none;
   z-index: 0;
 }
@@ -62,9 +62,9 @@ body::after {
   background:
     linear-gradient(
       to bottom,
-      rgba(243, 245, 249, 0.90) 0%,
-      rgba(243, 245, 249, 0.82) 38%,
-      rgba(243, 245, 249, 0.88) 100%
+      rgba(243, 245, 249, 0.55) 0%,
+      rgba(243, 245, 249, 0.35) 38%,
+      rgba(243, 245, 249, 0.50) 100%
     );
   pointer-events: none;
   z-index: 0;
@@ -80,23 +80,23 @@ body::after {
 .container {
   max-width: 760px;
   margin: 0 auto;
-  padding: 24px 16px 56px;
+  padding: 12px 16px 40px;
 }
 
 .header {
-  margin-bottom: 18px;
+  margin-bottom: 10px;
 }
 
 .titleLogo {
   display: block;
-  width: min(88vw, 420px);
+  width: min(78vw, 340px);
   height: auto;
-  margin: 0 0 10px;
+  margin: 0 auto 8px;
   filter: drop-shadow(0 6px 14px rgba(15, 23, 42, 0.10));
 }
 
 .dateText {
-  margin: 0;
+  margin: 0 0 10px;
   font-size: 14px;
   color: var(--sub);
   font-weight: 700;
@@ -104,8 +104,8 @@ body::after {
 
 .card {
   background: var(--card);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   padding: 18px;
@@ -336,9 +336,9 @@ button.secondary {
   width: 100%;
   max-width: 560px;
   margin: auto 0;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 22px;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
   padding: 18px;
@@ -374,9 +374,9 @@ button.secondary {
   position: sticky;
   top: 0;
   z-index: 2;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   padding-bottom: 10px;
   border-bottom: 1px solid rgba(15, 23, 42, 0.06);
 }
@@ -550,11 +550,12 @@ button.secondary {
 
 @media (max-width: 640px) {
   .container {
-    padding: 18px 14px 48px;
+    padding: 12px 14px 40px;
   }
 
   .titleLogo {
-    width: min(86vw, 360px);
+    width: min(78vw, 320px);
+    margin: 0 auto 8px;
   }
 
   .summaryGrid,
@@ -596,7 +597,8 @@ button.secondary {
   }
 
   body::before {
-    background-size: min(100vw, 680px) auto;
-    opacity: 0.12;
+    background-position: center 110px;
+    background-size: min(100vw, 700px) auto;
+    opacity: 0.22;
   }
 }
