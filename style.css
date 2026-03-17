@@ -4,7 +4,7 @@
 
 :root {
   --bg: #eef2f7;
-  --card: rgba(255, 255, 255, 0.9);
+  --card: rgba(255, 255, 255, 0.92);
   --card-soft: rgba(248, 250, 252, 0.88);
   --text: #172033;
   --sub: #6b7280;
@@ -14,9 +14,7 @@
   --success-text: #067647;
   --info-bg: #eff6ff;
   --info-text: #1d4ed8;
-  --danger-bg: #fef2f2;
-  --danger-text: #b42318;
-  --shadow: 0 12px 30px rgba(15, 23, 42, 0.1);
+  --shadow: 0 12px 30px rgba(15, 23, 42, 0.10);
   --card-shadow-strong: 0 18px 40px rgba(15, 23, 42, 0.14);
   --radius-lg: 24px;
   --radius-md: 16px;
@@ -72,33 +70,88 @@ body::after {
 }
 
 .container {
+  min-height: 100vh;
   max-width: 760px;
   margin: 0 auto;
-  padding: 250px 16px 28px;
+  padding: 0 16px 24px;
+  display: flex;
+  align-items: flex-end;
 }
 
-.card {
-  position: relative;
-  z-index: 2;
-  background: var(--card);
+.homePanel {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.90);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: var(--radius-lg);
   box-shadow: var(--card-shadow-strong);
   border: 1px solid rgba(255, 255, 255, 0.52);
   padding: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
-.cardHeader {
-  margin-bottom: 10px;
+.modePicker {
+  display: grid;
+  grid-template-columns: 52px 1fr 52px;
+  gap: 10px;
+  align-items: center;
 }
 
-.card h2 {
-  margin: 0 0 4px;
-  font-size: 22px;
-  line-height: 1.2;
+.navButton {
+  appearance: none;
+  border: none;
+  border-radius: 14px;
+  background: var(--accent);
+  color: #fff;
+  height: 48px;
+  min-height: 48px;
+  padding: 0;
+  font-size: 28px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+  cursor: pointer;
+}
+
+.modeCenter {
+  min-width: 0;
+  text-align: center;
+}
+
+.currentModeName {
+  font-size: 26px;
   font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.currentModeDescription {
+  margin: 0;
+  color: var(--sub);
+  font-size: 13px;
+  line-height: 1.45;
+  min-height: 38px;
+}
+
+.homeActions {
+  margin-top: 14px;
+}
+
+.startPrimaryButton {
+  width: 100%;
+  appearance: none;
+  border: none;
+  border-radius: 14px;
+  background: var(--accent);
+  color: #ffffff;
+  min-height: 48px;
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
 }
 
 .subText {
@@ -106,26 +159,6 @@ body::after {
   color: var(--sub);
   font-size: 13px;
   line-height: 1.45;
-}
-
-.modeTabs {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-}
-
-.modeSelectButton {
-  appearance: none;
-  border: none;
-  border-radius: 14px;
-  background: var(--accent);
-  color: #ffffff;
-  padding: 12px 14px;
-  min-height: 48px;
-  font-size: 16px;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
 }
 
 .summaryGrid,
@@ -221,7 +254,6 @@ button.secondary {
   display: none !important;
 }
 
-/* modal */
 .modal {
   position: fixed;
   inset: 0;
@@ -525,11 +557,32 @@ button.secondary {
 
 @media (max-width: 640px) {
   .container {
-    padding: 260px 14px 32px;
+    padding: 0 14px 22px;
   }
 
-  .card {
-    padding: 16px;
+  .homePanel {
+    margin-bottom: 14px;
+    padding: 14px;
+  }
+
+  .modePicker {
+    grid-template-columns: 46px 1fr 46px;
+    gap: 8px;
+  }
+
+  .navButton {
+    height: 44px;
+    min-height: 44px;
+    font-size: 24px;
+  }
+
+  .currentModeName {
+    font-size: 24px;
+  }
+
+  .currentModeDescription {
+    font-size: 12px;
+    min-height: 34px;
   }
 
   .summaryGrid,
@@ -583,10 +636,5 @@ button.secondary {
     width: 40px;
     min-width: 40px;
     height: 40px;
-  }
-
-  body::before {
-    background-position: center top;
-    background-size: cover;
   }
 }
