@@ -326,7 +326,10 @@ function openModeModal(mode) {
   updateModalInfo(currentMode, currentLimit);
   updateLimitButtons(currentLimit);
   showReadyView();
-  if (modeModalEl) modeModalEl.classList.remove("hidden");
+  if (modeModalEl) {
+    modeModalEl.classList.remove("hidden");
+    modeModalEl.scrollTop = 0;
+  }
 }
 
 function closeModeModal() {
