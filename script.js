@@ -1,4 +1,4 @@
-const STORAGE_KEY = "math-training-modal-c-layout-v2";
+const STORAGE_KEY = "math-training-modal-c-layout-v3";
 
 const modeOrder = ["ten", "carry", "borrow", "survival"];
 
@@ -116,6 +116,7 @@ let isLocked = false;
 
 let survivalLives = 0;
 let survivalScore = 0;
+let currentAnswerValue = "";
 
 let perQuestionStart = 0;
 let perQuestionFrameId = null;
@@ -621,6 +622,96 @@ function updateProgress() {
   }
 }
 
+function getCurrentRenderedQuestion() {
+  return questions[currentQuestionIndex] || questions[0] || null;
+}
+
+function updateAnswerDisplay() {
+  const answerDisplayEl = document.getElementById("answerDisplay");
+  if (!answerDisplayEl) return;
+
+  if (!currentAnswerValue) {
+    answerDisplayEl.textContent = "入力";
+    answerDisplayEl.classList.add("is-empty");
+    return;
+  }
+
+  answerDisplayEl.textContent = currentAnswerValue;
+  answerDisplayEl.classList.remove("is-empty");
+}
+
+function clearAnswer() {
+  if (!started || isLocked) return;
+  currentAnswerValue = "";
+  updateAnswerDisplay();
+}
+
+function deleteAnswer() {
+  if (!started || isLocked) return;
+  currentAnswerValue = currentAnswerValue.slice(0, -1);
+  updateAnswerDisplay();
+}
+
+function appendDigit(digit) {
+  if (!started || isLocked) return;
+
+  const q = getCurrentRenderedQuestion();
+  if (!q) return;
+
+  const requiredDigits = getAnswerDigits(q.answer);
+  if (currentAnswerValue.length >= requiredDigits) return;
+
+  currentAnswerValue += digit;
+  updateAnswerDisplay();
+
+  if (currentAnswerValue.length >= requiredDigits) {
+    setTimeout(() => {
+      if (started && !isLocked) {
+        submitCurrentAnswer();
+      }
+    }, 80);
+  }
+}
+
+function submitCurrentAnswer() {
+  if (!started || isLocked) return;
+
+  const q = getCurrentRenderedQuestion();
+  if (!q) return;
+
+  const requiredDigits = getAnswerDigits(q.answer);
+  if (currentAnswerValue.length < requiredDigits) return;
+
+  const numericValue = Number(currentAnswerValue);
+  const isCorrect = numericValue === q.answer;
+  lockAndJudge(isCorrect);
+}
+
+function bindKeypadButtons() {
+  const keypadButtons = Array.from(document.querySelectorAll(".keypadButton"));
+
+  keypadButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const action = button.dataset.action;
+      const key = button.dataset.key;
+
+      if (action === "clear") {
+        clearAnswer();
+        return;
+      }
+
+      if (action === "delete") {
+        deleteAnswer();
+        return;
+      }
+
+      if (key) {
+        appendDigit(key);
+      }
+    });
+  });
+}
+
 function renderCurrentQuestion() {
   if (!modalQuizFormEl) return;
 
@@ -636,37 +727,41 @@ function renderCurrentQuestion() {
 
   if (!q) return;
 
+  currentAnswerValue = "";
+
   modalQuizFormEl.innerHTML = `
     <div class="questionRow">
-      <label class="questionLabel" for="answerInput">
+      <label class="questionLabel">
         <span class="questionNumber">${isSurvivalMode() ? `サバイバル ${survivalScore + 1}問目` : `問${currentQuestionIndex + 1}`}</span>
         <span>${q.text} = </span>
       </label>
-      <input
-        id="answerInput"
-        class="answerInput"
-        type="number"
-        inputmode="numeric"
-        autocomplete="off"
-        enterkeyhint="done"
-      />
+
+      <div id="answerDisplay" class="answerDisplay is-empty">入力</div>
+
+      <div class="keypadGrid">
+        <button class="keypadButton" type="button" data-key="1">1</button>
+        <button class="keypadButton" type="button" data-key="2">2</button>
+        <button class="keypadButton" type="button" data-key="3">3</button>
+
+        <button class="keypadButton" type="button" data-key="4">4</button>
+        <button class="keypadButton" type="button" data-key="5">5</button>
+        <button class="keypadButton" type="button" data-key="6">6</button>
+
+        <button class="keypadButton" type="button" data-key="7">7</button>
+        <button class="keypadButton" type="button" data-key="8">8</button>
+        <button class="keypadButton" type="button" data-key="9">9</button>
+
+        <button class="keypadButton function" type="button" data-action="clear">C</button>
+        <button class="keypadButton" type="button" data-key="0">0</button>
+        <button class="keypadButton function" type="button" data-action="delete">←</button>
+      </div>
+
       <div id="feedbackText" class="feedback"></div>
     </div>
   `;
 
-  const input = document.getElementById("answerInput");
-  if (input) {
-    const isDesktopLike = window.matchMedia("(min-width: 641px)").matches;
-
-    if (isDesktopLike) {
-      setTimeout(() => {
-        input.focus();
-      }, 50);
-    }
-
-    input.addEventListener("input", handleAutoSubmit);
-  }
-
+  bindKeypadButtons();
+  updateAnswerDisplay();
   updateProgress();
   updateSurvivalHud();
   startPerQuestionLimit();
@@ -972,21 +1067,6 @@ function lockAndJudge(isCorrect) {
 function handleTimeUp() {
   if (!started || isLocked) return;
   lockAndJudge(false);
-}
-
-function handleAutoSubmit(event) {
-  if (!started || isLocked) return;
-
-  const input = event.target;
-  const q = questions[currentQuestionIndex] || questions[0];
-  const requiredDigits = getAnswerDigits(q.answer);
-  const currentValue = input.value.replace("-", "");
-
-  if (currentValue.length < requiredDigits) return;
-
-  const numericValue = Number(input.value);
-  const isCorrect = numericValue === q.answer;
-  lockAndJudge(isCorrect);
 }
 
 prevModeButtonEl?.addEventListener("click", goPrevMode);
