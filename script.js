@@ -656,7 +656,14 @@ function renderCurrentQuestion() {
 
   const input = document.getElementById("answerInput");
   if (input) {
-    input.focus();
+    const isDesktopLike = window.matchMedia("(min-width: 641px)").matches;
+
+    if (isDesktopLike) {
+      setTimeout(() => {
+        input.focus();
+      }, 50);
+    }
+
     input.addEventListener("input", handleAutoSubmit);
   }
 
