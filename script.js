@@ -1,4 +1,4 @@
-const STORAGE_KEY = "math-training-modal-c-layout-v3";
+const STORAGE_KEY = "math-training-modal-c-layout-v4";
 
 const modeOrder = ["ten", "carry", "borrow", "survival"];
 
@@ -149,7 +149,9 @@ function primeAudio(audio) {
       audio.pause();
       audio.currentTime = 0;
     }).catch(() => {});
-  } catch (error) {}
+  } catch (error) {
+    // no-op
+  }
 }
 
 function unlockAudio() {
@@ -165,6 +167,7 @@ function playMenuBgm() {
   if (!audioEnabled || !audioUnlocked) return;
   playBgm.pause();
   playBgm.currentTime = 0;
+
   if (menuBgm.paused) {
     menuBgm.currentTime = 0;
     menuBgm.play().catch(() => {});
@@ -175,6 +178,7 @@ function playPlayBgm() {
   if (!audioEnabled || !audioUnlocked) return;
   menuBgm.pause();
   menuBgm.currentTime = 0;
+
   if (playBgm.paused) {
     playBgm.currentTime = 0;
     playBgm.play().catch(() => {});
@@ -730,33 +734,37 @@ function renderCurrentQuestion() {
   currentAnswerValue = "";
 
   modalQuizFormEl.innerHTML = `
-    <div class="questionRow">
-      <label class="questionLabel">
-        <span class="questionNumber">${isSurvivalMode() ? `サバイバル ${survivalScore + 1}問目` : `問${currentQuestionIndex + 1}`}</span>
-        <span>${q.text} = </span>
-      </label>
+    <div class="questionShell">
+      <div class="questionTop">
+        <div class="questionNumber">${isSurvivalMode() ? `サバイバル ${survivalScore + 1}問目` : `問${currentQuestionIndex + 1}`}</div>
 
-      <div id="answerDisplay" class="answerDisplay is-empty">入力</div>
+        <div class="equationRow">
+          <div class="equationText">${q.text} =</div>
+          <div id="answerDisplay" class="answerDisplay is-empty">入力</div>
+        </div>
 
-      <div class="keypadGrid">
-        <button class="keypadButton" type="button" data-key="1">1</button>
-        <button class="keypadButton" type="button" data-key="2">2</button>
-        <button class="keypadButton" type="button" data-key="3">3</button>
-
-        <button class="keypadButton" type="button" data-key="4">4</button>
-        <button class="keypadButton" type="button" data-key="5">5</button>
-        <button class="keypadButton" type="button" data-key="6">6</button>
-
-        <button class="keypadButton" type="button" data-key="7">7</button>
-        <button class="keypadButton" type="button" data-key="8">8</button>
-        <button class="keypadButton" type="button" data-key="9">9</button>
-
-        <button class="keypadButton function" type="button" data-action="clear">C</button>
-        <button class="keypadButton" type="button" data-key="0">0</button>
-        <button class="keypadButton function" type="button" data-action="delete">←</button>
+        <div id="feedbackText" class="feedback"></div>
       </div>
 
-      <div id="feedbackText" class="feedback"></div>
+      <div class="keypadWrap">
+        <div class="keypadGrid">
+          <button class="keypadButton" type="button" data-key="1">1</button>
+          <button class="keypadButton" type="button" data-key="2">2</button>
+          <button class="keypadButton" type="button" data-key="3">3</button>
+
+          <button class="keypadButton" type="button" data-key="4">4</button>
+          <button class="keypadButton" type="button" data-key="5">5</button>
+          <button class="keypadButton" type="button" data-key="6">6</button>
+
+          <button class="keypadButton" type="button" data-key="7">7</button>
+          <button class="keypadButton" type="button" data-key="8">8</button>
+          <button class="keypadButton" type="button" data-key="9">9</button>
+
+          <button class="keypadButton function" type="button" data-action="clear">C</button>
+          <button class="keypadButton" type="button" data-key="0">0</button>
+          <button class="keypadButton function" type="button" data-action="delete">←</button>
+        </div>
+      </div>
     </div>
   `;
 
@@ -765,6 +773,15 @@ function renderCurrentQuestion() {
   updateProgress();
   updateSurvivalHud();
   startPerQuestionLimit();
+
+  requestAnimationFrame(() => {
+    if (modalQuizFormEl) {
+      modalQuizFormEl.scrollTop = 0;
+    }
+    if (modalQuizFormEl?.parentElement) {
+      modalQuizFormEl.parentElement.scrollTop = 0;
+    }
+  });
 }
 
 function startTimer() {
