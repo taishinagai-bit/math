@@ -16,10 +16,7 @@
   --info-text: #1d4ed8;
   --danger-bg: #fef2f2;
   --danger-text: #b42318;
-  --shadow: 0 12px 30px rgba(15, 23, 42, 0.1);
   --card-shadow-strong: 0 18px 40px rgba(15, 23, 42, 0.14);
-  --radius-lg: 24px;
-  --radius-md: 16px;
 }
 
 html,
@@ -31,6 +28,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
 }
 
 button,
@@ -62,6 +60,13 @@ body::after {
   background: rgba(238, 242, 247, 0.16);
   pointer-events: none;
   z-index: 0;
+}
+
+body.game-no-gesture,
+body.game-no-gesture * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .container,
@@ -449,6 +454,7 @@ button.secondary {
   -webkit-overflow-scrolling: touch;
   padding-top: 8px;
   padding-bottom: max(8px, env(safe-area-inset-bottom));
+  overscroll-behavior: contain;
 }
 
 .playBlock {
@@ -731,6 +737,37 @@ button.secondary {
     opacity: 1;
     transform: scale(1);
   }
+}
+
+button,
+.navButton,
+.startPrimaryButton,
+.iconButton,
+.limitOption,
+.difficultyOption,
+.keypadButton,
+.answerDisplay,
+.homePanel,
+.modalPlayableCard {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.keypadButton,
+.navButton,
+.startPrimaryButton,
+.iconButton,
+.limitOption,
+.difficultyOption {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.keypadButton,
+.navButton,
+.startPrimaryButton,
+.iconButton {
+  transform: translateZ(0);
 }
 
 @media (min-width: 641px) {
