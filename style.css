@@ -862,3 +862,113 @@ button.secondary {
     padding: 12px;
   }
 }
+/* ===== 上部情報をコンパクト化 ===== */
+.compactGrid,
+.survivalHud {
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.compactItem,
+.survivalHudItem {
+  min-height: 50px;
+  padding: 8px 10px;
+  border-radius: 12px;
+}
+
+.label,
+.survivalHudLabel {
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.value,
+.survivalHudValue {
+  font-size: 14px;
+  line-height: 1.1;
+}
+
+.playModeName {
+  font-size: 18px;
+}
+
+.playModeMeta {
+  font-size: 12px;
+}
+
+.modalHeader {
+  margin-bottom: 6px;
+}
+
+.playStickyHeader {
+  padding-bottom: 6px;
+}
+
+.limitMeterWrap {
+  margin-top: 4px;
+}
+
+.limitMeterLabel {
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.limitMeterTrack {
+  height: 8px;
+}
+
+/* ===== スマホではさらに詰める ===== */
+@media (max-width: 640px) {
+  .compactGrid,
+  .survivalHud {
+    gap: 5px;
+    margin-bottom: 5px;
+  }
+
+  .compactItem,
+  .survivalHudItem {
+    min-height: 44px;
+    padding: 7px 8px;
+    border-radius: 10px;
+  }
+
+  .label,
+  .survivalHudLabel {
+    font-size: 10px;
+    margin-bottom: 1px;
+  }
+
+  .value,
+  .survivalHudValue {
+    font-size: 13px;
+  }
+
+  .playModeName {
+    font-size: 16px;
+  }
+
+  .playModeMeta {
+    font-size: 11px;
+  }
+
+  .modalHeader {
+    margin-bottom: 4px;
+  }
+
+  .playStickyHeader {
+    padding-bottom: 4px;
+  }
+
+  .limitMeterWrap {
+    margin-top: 3px;
+  }
+
+  .limitMeterLabel {
+    font-size: 10px;
+    margin-bottom: 3px;
+  }
+
+  .limitMeterTrack {
+    height: 7px;
+  }
+}
