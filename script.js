@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const STORAGE_KEY = "math-training-modal-c-layout-v5";
+  const STORAGE_KEY = "math-training-modal-c-layout-v6";
 
   const modeOrder = ["ten", "carry", "borrow", "survival"];
 
@@ -166,6 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function playMenuBgm() {
     if (!audioEnabled || !audioUnlocked) return;
+
     playBgm.pause();
     playBgm.currentTime = 0;
 
@@ -177,6 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function playPlayBgm() {
     if (!audioEnabled || !audioUnlocked) return;
+
     menuBgm.pause();
     menuBgm.currentTime = 0;
 
@@ -402,20 +404,24 @@ document.addEventListener("DOMContentLoaded", () => {
   function makeCarryRange(minA, maxA, minB, maxB) {
     let a;
     let b;
+
     do {
       a = randInt(minA, maxA);
       b = randInt(minB, maxB);
     } while ((a % 10) + (b % 10) < 10);
+
     return { text: `${a} + ${b}`, answer: a + b };
   }
 
   function makeBorrowRange(minA, maxA, minB, maxB) {
     let a;
     let b;
+
     do {
       a = randInt(minA, maxA);
       b = randInt(minB, Math.min(maxB, a - 1));
     } while ((a % 10) >= (b % 10));
+
     return { text: `${a} - ${b}`, answer: a - b };
   }
 
@@ -481,11 +487,13 @@ document.addEventListener("DOMContentLoaded", () => {
         ? makeCarryRange(15, 49, 10, 35)
         : makeBorrowRange(25, 59, 10, 35);
     }
+
     if (stage === 2) {
       return Math.random() < 0.5
         ? makeCarryRange(30, 69, 15, 45)
         : makeBorrowRange(45, 89, 15, 45);
     }
+
     return Math.random() < 0.5
       ? makeCarryRange(45, 99, 25, 59)
       : makeBorrowRange(60, 99, 25, 59);
@@ -495,6 +503,32 @@ document.addEventListener("DOMContentLoaded", () => {
     if (mode === "carry") return makeCarry();
     if (mode === "borrow") return makeBorrow();
     return Math.random() < 0.5 ? makeAdd() : makeSub();
+  }
+
+  function generateQuestions() {
+    questions = [];
+    const count = modeConfig[currentMode].count;
+
+    for (let i = 0; i < count; i += 1) {
+      questions.push(createQuestion(currentMode));
+    }
+
+    currentQuestionIndex = 0;
+    correctCount = 0;
+    isLocked = false;
+  }
+
+  function updateSurvivalHud() {
+    if (survivalLivesEl) {
+      survivalLivesEl.textContent = "❤️".repeat(Math.max(0, survivalLives));
+    }
+    if (survivalScoreEl) {
+      survivalScoreEl.textContent = String(survivalScore);
+    }
+  }
+
+  function getAnswerDigits(answer) {
+    return String(Math.abs(answer)).length;
   }
 
   function updateHomeMode() {
