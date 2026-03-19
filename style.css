@@ -548,10 +548,11 @@ button.secondary {
 }
 
 .equationRow {
-  display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(96px, 0.9fr);
-  gap: 8px;
+  display: flex;
   align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  flex-wrap: nowrap;
 }
 
 .equationText {
@@ -561,10 +562,13 @@ button.secondary {
   letter-spacing: -0.02em;
   color: var(--text);
   white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .answerDisplay {
-  width: 100%;
+  width: 108px;
+  min-width: 108px;
+  max-width: 108px;
   min-height: 50px;
   border: 1px solid #d7dce4;
   border-radius: 14px;
@@ -806,7 +810,7 @@ button,
   }
 
   .equationRow {
-    grid-template-columns: minmax(0, 1.8fr) minmax(120px, 1fr);
+    gap: 16px;
   }
 
   .equationText {
@@ -814,6 +818,9 @@ button,
   }
 
   .answerDisplay {
+    width: 124px;
+    min-width: 124px;
+    max-width: 124px;
     min-height: 56px;
     font-size: 26px;
   }
