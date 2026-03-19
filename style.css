@@ -184,28 +184,36 @@ body::after {
 }
 
 .compactGrid {
-  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  margin-bottom: 5px;
 }
 
-.compactItem {
-  min-height: 80px;
+.compactItem,
+.survivalHudItem {
+  min-height: 44px;
+  padding: 7px 8px;
+  border-radius: 10px;
 }
 
-.label {
-  font-size: 13px;
+.label,
+.survivalHudLabel {
+  font-size: 10px;
   color: var(--sub);
-  margin-bottom: 6px;
+  margin-bottom: 1px;
 }
 
-.value {
-  font-size: 28px;
+.value,
+.survivalHudValue {
+  font-size: 13px;
   font-weight: 800;
-  line-height: 1.15;
+  line-height: 1.1;
   letter-spacing: -0.02em;
 }
 
 .smallValue {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.45;
   font-weight: 700;
 }
@@ -213,7 +221,8 @@ body::after {
 .buttonRow {
   display: flex;
   gap: 10px;
-  margin-top: 16px;
+  margin-top: 12px;
+  padding-bottom: 6px;
 }
 
 button {
@@ -260,7 +269,7 @@ button.secondary {
   position: fixed;
   inset: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding:
     max(10px, env(safe-area-inset-top))
@@ -284,7 +293,7 @@ button.secondary {
   -webkit-backdrop-filter: blur(12px);
   border-radius: 22px;
   box-shadow: var(--card-shadow-strong);
-  padding: 14px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -295,16 +304,16 @@ button.secondary {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
 }
 
 .compactModalHeader {
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .modalHeader h2 {
   margin: 0;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
   flex: 1;
   min-width: 0;
@@ -316,9 +325,9 @@ button.secondary {
   border-radius: 12px;
   background: var(--accent-weak);
   color: var(--text);
-  width: 42px;
-  min-width: 42px;
-  height: 42px;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
   font-size: 24px;
   font-weight: 700;
   cursor: pointer;
@@ -344,7 +353,7 @@ button.secondary {
 
 .limitOptions {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin-top: 10px;
 }
@@ -427,17 +436,19 @@ button.secondary {
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  padding-bottom: 8px;
+  padding-bottom: 4px;
   border-bottom: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 .playScrollArea {
+  display: flex;
+  flex-direction: column;
   min-height: 0;
   flex: 1 1 auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding-top: 10px;
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  padding-top: 8px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
 }
 
 .playBlock {
@@ -453,74 +464,41 @@ button.secondary {
 }
 
 .playModeName {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 800;
   line-height: 1.2;
 }
 
 .playModeMeta {
-  font-size: 13px;
+  font-size: 11px;
   color: var(--sub);
   font-weight: 700;
-}
-
-.compactGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.compactItem {
-  min-height: 68px;
-  padding: 10px 12px;
 }
 
 .survivalHud {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.survivalHudItem {
-  min-height: 68px;
-  padding: 10px 12px;
-  border-radius: 14px;
-  background: var(--card-soft);
-}
-
-.survivalHudLabel {
-  display: block;
-  font-size: 12px;
-  color: var(--sub);
-  margin-bottom: 4px;
-}
-
-.survivalHudValue {
-  display: block;
-  font-size: 18px;
-  font-weight: 800;
-  line-height: 1.2;
+  gap: 5px;
+  margin-bottom: 5px;
 }
 
 .limitMeterWrap {
-  margin-top: 6px;
+  margin-top: 3px;
 }
 
 .limitMeterLabel {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 10px;
   color: var(--sub);
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 3px;
 }
 
 .limitMeterTrack {
   width: 100%;
-  height: 10px;
+  height: 7px;
   background: #e5e7eb;
   border-radius: 999px;
   overflow: hidden;
@@ -537,50 +515,60 @@ button.secondary {
 .quizForm {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-.questionRow {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-  align-items: center;
-  background: var(--card-soft);
-  border-radius: 18px;
-  padding: 12px;
-}
-
-.questionLabel {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   gap: 8px;
-  font-size: 24px;
-  line-height: 1.2;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+}
+
+.questionShell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  gap: 8px;
+}
+
+.questionTop {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--card-soft);
+  border-radius: 16px;
+  padding: 10px;
 }
 
 .questionNumber {
-  width: 100%;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.3;
   color: var(--sub);
   font-weight: 700;
 }
 
+.equationRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(96px, 0.9fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.equationText {
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  white-space: nowrap;
+}
+
 .answerDisplay {
   width: 100%;
-  min-height: 58px;
+  min-height: 50px;
   border: 1px solid #d7dce4;
-  border-radius: 18px;
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.97);
-  padding: 10px 12px;
+  padding: 8px 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 800;
   color: var(--text);
   letter-spacing: -0.02em;
@@ -588,26 +576,37 @@ button.secondary {
 }
 
 .answerDisplay.is-empty {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--sub);
+}
+
+.keypadWrap {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  padding-top: 6px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .keypadGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  gap: 7px;
 }
 
 .keypadButton {
   appearance: none;
   border: 1px solid #dde3ea;
-  border-radius: 14px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.98);
   color: var(--text);
-  min-height: 54px;
+  min-height: 48px;
   padding: 0;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
   cursor: pointer;
   box-shadow: none;
@@ -623,8 +622,8 @@ button.secondary {
 }
 
 .feedback {
-  min-height: 22px;
-  font-size: 14px;
+  min-height: 18px;
+  font-size: 12px;
   font-weight: 800;
 }
 
@@ -637,10 +636,10 @@ button.secondary {
 }
 
 .survivalResultHero {
-  margin-top: 14px;
-  margin-bottom: 14px;
-  padding: 16px;
-  border-radius: 18px;
+  margin-top: 8px;
+  margin-bottom: 10px;
+  padding: 14px;
+  border-radius: 16px;
   background: linear-gradient(
     135deg,
     rgba(15, 23, 42, 0.96),
@@ -665,7 +664,7 @@ button.secondary {
 
 .survivalResultScore {
   margin-top: 10px;
-  font-size: 32px;
+  font-size: 28px;
   line-height: 1.15;
   font-weight: 900;
   letter-spacing: -0.03em;
@@ -677,6 +676,15 @@ button.secondary {
   line-height: 1.5;
   color: rgba(255, 255, 255, 0.88);
   font-weight: 700;
+}
+
+.resultGrid {
+  gap: 10px;
+}
+
+.resultItem {
+  min-height: 72px;
+  padding: 12px;
 }
 
 .judgeOverlay {
@@ -725,90 +733,31 @@ button.secondary {
   }
 }
 
-@media (max-width: 640px) {
-  .container {
-    padding: 0 14px 24px;
+@media (min-width: 641px) {
+  .modal {
     align-items: center;
   }
 
-  .homePanel {
-    padding: 14px;
-    margin-top: 110px;
-  }
-
-  .modePicker {
-    grid-template-columns: 46px 1fr 46px;
-    gap: 8px;
-  }
-
-  .navButton {
-    height: 44px;
-    min-height: 44px;
-    font-size: 24px;
-  }
-
-  .currentModeName {
-    font-size: 24px;
-  }
-
-  .currentModeDescription {
-    font-size: 12px;
-    min-height: 34px;
-  }
-
-  .modal {
-    align-items: flex-start;
-  }
-
-  .modalPlayableCard {
-    border-radius: 18px;
-    padding: 12px;
-    max-height: calc(100dvh - 12px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  }
-
-  .modalHeader h2 {
-    font-size: 20px;
-  }
-
-  .iconButton {
-    width: 40px;
-    min-width: 40px;
-    height: 40px;
-  }
-
-  .summaryGrid,
-  .resultGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .compactGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
+  .compactGrid,
   .survivalHud {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 8px;
   }
 
-  .limitOptions {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .compactItem,
+  .survivalHudItem {
+    min-height: 56px;
+    padding: 8px 10px;
   }
 
-  .buttonRow {
-    flex-direction: column;
-    margin-top: 12px;
-    padding-bottom: 6px;
+  .label,
+  .survivalHudLabel {
+    font-size: 11px;
   }
 
-  .buttonRow button {
-    width: 100%;
-  }
-
-  .value {
-    font-size: 22px;
-  }
-
-  .smallValue {
-    font-size: 14px;
+  .value,
+  .survivalHudValue {
+    font-size: 16px;
   }
 
   .playModeName {
@@ -819,156 +768,25 @@ button.secondary {
     font-size: 12px;
   }
 
-  .questionLabel {
-    font-size: 22px;
+  .equationRow {
+    grid-template-columns: minmax(0, 1.8fr) minmax(120px, 1fr);
+  }
+
+  .equationText {
+    font-size: 26px;
   }
 
   .answerDisplay {
-    min-height: 54px;
-    font-size: 24px;
+    min-height: 56px;
+    font-size: 26px;
   }
 
   .answerDisplay.is-empty {
-    font-size: 16px;
-  }
-
-  .keypadGrid {
-    gap: 7px;
+    font-size: 17px;
   }
 
   .keypadButton {
-    min-height: 50px;
-    font-size: 20px;
-    border-radius: 12px;
-  }
-
-  .survivalResultHero {
-    margin-top: 8px;
-    margin-bottom: 10px;
-    padding: 14px;
-    border-radius: 16px;
-  }
-
-  .survivalResultScore {
-    font-size: 28px;
-  }
-
-  .resultGrid {
-    gap: 10px;
-  }
-
-  .resultItem {
-    min-height: 72px;
-    padding: 12px;
-  }
-}
-/* ===== 上部情報をコンパクト化 ===== */
-.compactGrid,
-.survivalHud {
-  gap: 6px;
-  margin-bottom: 6px;
-}
-
-.compactItem,
-.survivalHudItem {
-  min-height: 50px;
-  padding: 8px 10px;
-  border-radius: 12px;
-}
-
-.label,
-.survivalHudLabel {
-  font-size: 11px;
-  margin-bottom: 2px;
-}
-
-.value,
-.survivalHudValue {
-  font-size: 14px;
-  line-height: 1.1;
-}
-
-.playModeName {
-  font-size: 18px;
-}
-
-.playModeMeta {
-  font-size: 12px;
-}
-
-.modalHeader {
-  margin-bottom: 6px;
-}
-
-.playStickyHeader {
-  padding-bottom: 6px;
-}
-
-.limitMeterWrap {
-  margin-top: 4px;
-}
-
-.limitMeterLabel {
-  font-size: 11px;
-  margin-bottom: 4px;
-}
-
-.limitMeterTrack {
-  height: 8px;
-}
-
-/* ===== スマホではさらに詰める ===== */
-@media (max-width: 640px) {
-  .compactGrid,
-  .survivalHud {
-    gap: 5px;
-    margin-bottom: 5px;
-  }
-
-  .compactItem,
-  .survivalHudItem {
-    min-height: 44px;
-    padding: 7px 8px;
-    border-radius: 10px;
-  }
-
-  .label,
-  .survivalHudLabel {
-    font-size: 10px;
-    margin-bottom: 1px;
-  }
-
-  .value,
-  .survivalHudValue {
-    font-size: 13px;
-  }
-
-  .playModeName {
-    font-size: 16px;
-  }
-
-  .playModeMeta {
-    font-size: 11px;
-  }
-
-  .modalHeader {
-    margin-bottom: 4px;
-  }
-
-  .playStickyHeader {
-    padding-bottom: 4px;
-  }
-
-  .limitMeterWrap {
-    margin-top: 3px;
-  }
-
-  .limitMeterLabel {
-    font-size: 10px;
-    margin-bottom: 3px;
-  }
-
-  .limitMeterTrack {
-    height: 7px;
+    min-height: 54px;
+    font-size: 22px;
   }
 }
