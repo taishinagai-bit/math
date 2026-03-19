@@ -1,1 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>ぽけっと計算タイム</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <section id="homeScreen" class="homePanel">
+      <div class="modePicker">
+        <button id="prevModeButton" class="navButton" type="button" aria-label="前のモード">‹</button>
 
+        <div class="modeCenter">
+          <div id="currentModeName" class="currentModeName">10問連続</div>
+          <p id="currentModeDescription" class="currentModeDescription">
+            足し算・引き算をテンポよく10問
+          </p>
+        </div>
+
+        <button id="nextModeButton" class="navButton" type="button" aria-label="次のモード">›</button>
+      </div>
+
+      <div class="homeActions">
+        <button id="openSelectedModeButton" class="startPrimaryButton" type="button">このモードで始める</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="modeModal" class="modal hidden">
+    <div class="modalCard modalPlayableCard">
+      <div id="modalReadyView">
+        <div class="modalHeader">
+          <h2 id="modalModeName">10問連続</h2>
+          <button id="closeModalButton" type="button" class="iconButton" aria-label="閉じる">×</button>
+        </div>
+
+        <p id="modalModeDescription" class="subText"></p>
+
+        <div class="summaryGrid modalGrid">
+          <div class="summaryItem">
+            <div class="label">ベスト</div>
+            <div id="modalBestTime" class="value smallValue">未記録</div>
+          </div>
+          <div class="summaryItem">
+            <div class="label">前回記録</div>
+            <div id="modalLastRecord" class="value smallValue">未記録</div>
+          </div>
+        </div>
+
+        <div id="normalLimitBlock" class="limitBlock">
+          <div class="label">リミット設定</div>
+          <div class="limitOptions">
+            <button class="limitOption active" data-limit="0" type="button">制限なし</button>
+            <button class="limitOption" data-limit="1" type="button">1秒</button>
+            <button class="limitOption" data-limit="2" type="button">2秒</button>
+            <button class="limitOption" data-limit="3" type="button">3秒</button>
+            <button class="limitOption" data-limit="4" type="button">4秒</button>
+            <button class="limitOption" data-limit="5" type="button">5秒</button>
+          </div>
+        </div>
+
+        <div id="survivalDifficultyBlock" class="limitBlock hidden">
+          <div class="label">難易度選択</div>
+          <div class="difficultyOptions">
+            <button class="difficultyOption active" data-difficulty="easy" type="button">
+              <span class="difficultyName">イージー</span>
+              <span class="difficultyMeta">❤️❤️❤️ / 5秒</span>
+            </button>
+            <button class="difficultyOption" data-difficulty="normal" type="button">
+              <span class="difficultyName">ノーマル</span>
+              <span class="difficultyMeta">❤️❤️ / 4秒</span>
+            </button>
+            <button class="difficultyOption" data-difficulty="hard" type="button">
+              <span class="difficultyName">ハード</span>
+              <span class="difficultyMeta">❤️ / 3秒</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="buttonRow">
+          <button id="modalStartButton" type="button">スタート</button>
+        </div>
+      </div>
+
+      <div id="modalPlayView" class="hidden">
+        <div class="playStickyHeader">
+          <div class="modalHeader compactModalHeader">
+            <div class="playTitleGroup">
+              <div id="playModeName" class="playModeName">10問連続</div>
+              <div id="playModeMeta" class="playModeMeta">制限なし</div>
+            </div>
+            <button id="closePlayModalButton" type="button" class="iconButton" aria-label="閉じる">×</button>
+          </div>
+
+          <div class="summaryGrid compactGrid">
+            <div class="summaryItem compactItem">
+              <div class="label">タイム</div>
+              <div id="modalTimer" class="value">00:00</div>
+            </div>
+            <div class="summaryItem compactItem">
+              <div class="label">進行</div>
+              <div id="modalProgress" class="value">1 / 10</div>
+            </div>
+          </div>
+
+          <div id="survivalHud" class="survivalHud hidden">
+            <div class="survivalHudItem">
+              <span class="survivalHudLabel">ライフ</span>
+              <span id="survivalLives" class="survivalHudValue">❤️❤️❤️</span>
+            </div>
+            <div class="survivalHudItem">
+              <span class="survivalHudLabel">正解数</span>
+              <span id="survivalScore" class="survivalHudValue">0</span>
+            </div>
+          </div>
+
+          <div id="limitMeterWrap" class="limitMeterWrap hidden">
+            <div class="limitMeterLabel">
+              <span>リミット</span>
+              <span id="limitMeterText">3.0秒</span>
+            </div>
+            <div class="limitMeterTrack">
+              <div id="limitMeterBar" class="limitMeterBar"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="playScrollArea">
+          <div class="playBlock">
+            <p id="modalPlayDescription" class="subText"></p>
+            <form id="modalQuizForm" class="quizForm"></form>
+          </div>
+        </div>
+      </div>
+
+      <div id="modalResultView" class="hidden">
+        <div class="modalHeader">
+          <h2>結果</h2>
+          <button id="modalCloseAfterResultButtonTop" type="button" class="iconButton" aria-label="閉じる">×</button>
+        </div>
+
+        <p class="subText">今回の記録です</p>
+
+        <div id="survivalResultHero" class="survivalResultHero hidden">
+          <div id="survivalResultRank" class="survivalResultRank">見習い</div>
+          <div id="survivalResultScore" class="survivalResultScore">0問突破</div>
+          <div id="survivalResultComment" class="survivalResultComment">まずはここから！</div>
+        </div>
+
+        <div class="resultGrid modalGrid">
+          <div class="resultItem">
+            <div class="label">結果</div>
+            <div id="resultCorrectCount" class="value"></div>
+          </div>
+          <div class="resultItem">
+            <div class="label">合計タイム</div>
+            <div id="resultFinalTime" class="value"></div>
+          </div>
+          <div class="resultItem">
+            <div class="label">平均時間</div>
+            <div id="resultAverageTime" class="value"></div>
+          </div>
+          <div class="resultItem">
+            <div class="label">前回比較</div>
+            <div id="resultComparisonText" class="value smallValue"></div>
+          </div>
+        </div>
+
+        <div id="resultBestUpdate" class="notice hidden"></div>
+        <div id="resultSpeedRating" class="notice subtle hidden"></div>
+
+        <div class="buttonRow">
+          <button id="modalRetryButton" type="button">もう一度やる</button>
+          <button id="modalCloseAfterResultButton" type="button" class="secondary">閉じる</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="judgeOverlay" class="judgeOverlay hidden">
+    <div id="judgeMark" class="judgeMark">⭕️</div>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
