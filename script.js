@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const STORAGE_KEY = "math-training-modal-c-layout-v6";
+  const STORAGE_KEY = "math-training-modal-c-layout-v7";
 
   const modeOrder = ["ten", "carry", "borrow", "survival"];
 
@@ -211,6 +211,16 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("touchstart", unlockOnce, { once: true });
     document.addEventListener("click", unlockOnce, { once: true });
   }
+
+  function setGameGestureLock(enabled) {
+    document.body.classList.toggle("game-no-gesture", enabled);
+  }
+
+  document.addEventListener("dblclick", (event) => {
+    if (event.target.closest(".modalPlayableCard, .homePanel")) {
+      event.preventDefault();
+    }
+  }, { passive: false });
 
   function isSurvivalMode(mode = currentMode) {
     return mode === "survival";
@@ -603,6 +613,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateLimitButtons(currentLimit);
     updateModalInfo(currentMode, currentLimit);
     showReadyView();
+    setGameGestureLock(true);
     modeModalEl?.classList.remove("hidden");
   }
 
@@ -611,6 +622,7 @@ document.addEventListener("DOMContentLoaded", () => {
     stopPerQuestionLimit();
     started = false;
     playMenuBgm();
+    setGameGestureLock(false);
     modeModalEl?.classList.add("hidden");
   }
 
